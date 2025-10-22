@@ -17,7 +17,16 @@ Deno.serve(async (req: Request) => {
   try {
     const profileData = await req.json();
 
+    console.log("Received profile data:", JSON.stringify(profileData, null, 2));
+
+    // Ensure we have the required fields for n8n
+    if (!profileData || Object.keys(profileData).length === 0) {
+      throw new Error("No profile data provided");
+    }
+
     const webhookUrl = "https://sunitaai.app.n8n.cloud/webhook/telegram_welcome";
+
+    console.log("Sending to webhook:", JSON.stringify(profileData, null, 2));
 
     const response = await fetch(webhookUrl, {
       method: "POST",
