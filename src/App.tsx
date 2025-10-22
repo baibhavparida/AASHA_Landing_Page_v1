@@ -57,6 +57,20 @@ function App() {
     };
   }, []);
 
+  React.useEffect(() => {
+    if (loading) {
+      document.title = 'AASHA - Loading...';
+    } else if (isAuthenticated) {
+      document.title = isFamilyMember ? 'AASHA - Family Dashboard' : 'AASHA - Dashboard';
+    } else if (showOnboarding) {
+      document.title = 'AASHA - Get Started';
+    } else if (showLogin) {
+      document.title = 'AASHA - Login';
+    } else {
+      document.title = 'AASHA - Your Friendly AI Companion';
+    }
+  }, [loading, isAuthenticated, isFamilyMember, showOnboarding, showLogin]);
+
   const checkAuth = async () => {
     try {
       console.log('Checking authentication session...');
