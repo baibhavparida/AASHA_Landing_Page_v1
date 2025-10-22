@@ -53,27 +53,78 @@ Deno.serve(async (req: Request) => {
   try {
     const registrationData: RegistrationData = await req.json();
 
-    const webhookUrl = "https://baibhavparida2.app.n8n.cloud/webhook/Initiate_call";
+    const initiateCallWebhookUrl = "https://sunitaai.app.n8n.cloud/webhook/Initiate_call";
+    const telegramWelcomeWebhookUrl = "https://sunitaai.app.n8n.cloud/webhook/telegram_welcome";
 
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(registrationData),
-    });
+    // Trigger both webhooks in parallel
+    const [initiateCallResponse, telegramWelcomeResponse] = await Promise.allSettled([
+      fetch(initiateCallWebhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(registrationData),
+      }),
+      fetch(telegramWelcomeWebhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(registrationData),
+      }),
+    ]);
 
-    if (!response.ok) {
-      console.error("Webhook failed:", await response.text());
-      throw new Error(`Webhook failed with status ${response.status}`);
+    // Process initiate call webhook response
+    let initiateCallResult = null;
+    let initiateCallError = null;
+    if (initiateCallResponse.status === "fulfilled") {
+      if (!initiateCallResponse.value.ok) {
+        const errorText = await initiateCallResponse.value.text();
+        console.error("Initiate call webhook failed:", errorText);
+        initiateCallError = `Initiate call webhook failed with status ${initiateCallResponse.value.status}`;
+      } else {
+        initiateCallResult = await initiateCallResponse.value.json().catch(() => ({ success: true }));
+      }
+    } else {
+      console.error("Initiate call webhook error:", initiateCallResponse.reason);
+      initiateCallError = initiateCallResponse.reason?.message || "Initiate call webhook failed";
     }
 
-    const result = await response.json().catch(() => ({ success: true }));
+    // Process telegram welcome webhook response
+    let telegramWelcomeResult = null;
+    let telegramWelcomeError = null;
+    if (telegramWelcomeResponse.status === "fulfilled") {
+      if (!telegramWelcomeResponse.value.ok) {
+        const errorText = await telegramWelcomeResponse.value.text();
+        console.error("Telegram welcome webhook failed:", errorText);
+        telegramWelcomeError = `Telegram welcome webhook failed with status ${telegramWelcomeResponse.value.status}`;
+      } else {
+        telegramWelcomeResult = await telegramWelcomeResponse.value.json().catch(() => ({ success: true }));
+      }
+    } else {
+      console.error("Telegram welcome webhook error:", telegramWelcomeResponse.reason);
+      telegramWelcomeError = telegramWelcomeResponse.reason?.message || "Telegram welcome webhook failed";
+    }
+
+    // Return success if at least one webhook succeeded
+    const success = !initiateCallError || !telegramWelcomeError;
 
     return new Response(
-      JSON.stringify({ success: true, webhookResponse: result }),
+      JSON.stringify({
+        success: success,
+        initiateCall: {
+          success: !initiateCallError,
+          result: initiateCallResult,
+          error: initiateCallError,
+        },
+        telegramWelcome: {
+          success: !telegramWelcomeError,
+          result: telegramWelcomeResult,
+          error: telegramWelcomeError,
+        },
+      }),
       {
-        status: 200,
+        status: success ? 200 : 500,
         headers: {
           ...corsHeaders,
           "Content-Type": "application/json",
@@ -82,11 +133,11 @@ Deno.serve(async (req: Request) => {
     );
   } catch (error: any) {
     console.error("Error in send-registration-webhook:", error);
-    
+
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error.message || "Failed to send webhook" 
+      JSON.stringify({
+        success: false,
+        error: error.message || "Failed to send webhooks"
       }),
       {
         status: 500,
