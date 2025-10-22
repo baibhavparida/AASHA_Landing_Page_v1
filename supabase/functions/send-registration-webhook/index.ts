@@ -28,6 +28,8 @@ interface RegistrationData {
     time: string;
   }>;
   interests: string[];
+  telegram_chat_id?: string;
+  telegram_username?: string;
   lovedOne?: {
     phoneNumber: string;
     countryCode: string;
@@ -56,6 +58,20 @@ Deno.serve(async (req: Request) => {
     const initiateCallWebhookUrl = "https://sunitaai.app.n8n.cloud/webhook/Initiate_call";
     const telegramWelcomeWebhookUrl = "https://sunitaai.app.n8n.cloud/webhook/telegram_welcome";
 
+    // Build Telegram-specific payload with proper field mapping
+    const telegramPayload = {
+      elderly_profile_id: registrationData.elderlyProfileId,
+      telegram_chat_id: registrationData.telegram_chat_id,
+      telegram_username: registrationData.telegram_username,
+      first_name: registrationData.lovedOne?.firstName || registrationData.firstName,
+      last_name: registrationData.lovedOne?.lastName || registrationData.lastName,
+      language: registrationData.lovedOne?.language || registrationData.language,
+      telegram_language_code: (registrationData.lovedOne?.language || registrationData.language) === 'Hindi' ? 'hi' : 'en',
+      phone_number: registrationData.lovedOne?.phoneNumber || registrationData.phoneNumber,
+      country_code: registrationData.lovedOne?.countryCode || registrationData.countryCode,
+      registration_type: registrationData.registrationType,
+    };
+
     // Trigger both webhooks in parallel
     const [initiateCallResponse, telegramWelcomeResponse] = await Promise.allSettled([
       fetch(initiateCallWebhookUrl, {
@@ -70,7 +86,7 @@ Deno.serve(async (req: Request) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(registrationData),
+        body: JSON.stringify(telegramPayload),
       }),
     ]);
 
