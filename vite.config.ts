@@ -12,4 +12,17 @@ export default defineConfig({
     port: 5176,
     strictPort: false,
   },
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          supabase: ['@supabase/supabase-js'],
+        },
+      },
+    },
+  },
+  base: '/',
 });

@@ -41,9 +41,11 @@ function App() {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    console.log('App mounted, checking authentication...');
     checkAuth();
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event, !!session);
       setIsAuthenticated(!!session);
       if (session) {
         checkUserType();
@@ -57,7 +59,15 @@ function App() {
 
   const checkAuth = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      console.log('Checking authentication session...');
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error('Error getting session:', error);
+        throw error;
+      }
+
+      console.log('Session check complete:', !!session);
       setIsAuthenticated(!!session);
       if (session) {
         await checkUserType();
@@ -66,6 +76,7 @@ function App() {
       console.error('Error checking auth:', error);
     } finally {
       setLoading(false);
+      console.log('Auth check complete, loading set to false');
     }
   };
 
