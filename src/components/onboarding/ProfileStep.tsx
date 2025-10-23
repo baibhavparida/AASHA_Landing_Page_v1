@@ -17,6 +17,7 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ data, updateData, onNext, onB
     gender: data.gender,
     language: data.language,
     maritalStatus: data.maritalStatus,
+    telegramUsername: data.telegramUsername || '',
   });
 
   const [dateError, setDateError] = useState<string>('');
@@ -92,7 +93,8 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ data, updateData, onNext, onB
       formData.dateOfBirth &&
       formData.gender &&
       formData.language &&
-      formData.maritalStatus
+      formData.maritalStatus &&
+      formData.telegramUsername
     ) {
       updateData(formData);
       onNext();
@@ -218,6 +220,17 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ data, updateData, onNext, onB
             <option value="Divorced">Divorced</option>
           </select>
         </div>
+
+        <div>
+          <label className="block text-gray-700 font-medium mb-2">Telegram Username</label>
+          <input
+            type="text"
+            value={formData.telegramUsername}
+            onChange={(e) => handleChange('telegramUsername', e.target.value)}
+            placeholder="@username"
+            className="w-full px-6 py-4 border-2 border-gray-300 rounded-lg text-lg focus:outline-none focus:border-[#F35E4A]"
+          />
+        </div>
       </div>
 
       <div className="flex justify-between mt-12">
@@ -234,7 +247,8 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ data, updateData, onNext, onB
             !formData.lastName ||
             !formData.dateOfBirth ||
             !formData.gender ||
-            !formData.maritalStatus
+            !formData.maritalStatus ||
+            !formData.telegramUsername
           }
           className="px-8 py-3 bg-[#F35E4A] text-white rounded-lg text-lg font-semibold hover:bg-[#e54d37] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >

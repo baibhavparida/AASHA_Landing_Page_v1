@@ -197,6 +197,7 @@ async function saveMyselfRegistration(data: OnboardingData) {
       marital_status: data.maritalStatus,
       call_time_preference: callTimePreference,
       relationship_to_caregiver: null,
+      telegram_username: data.telegramUsername || null,
     })
     .select()
     .single();

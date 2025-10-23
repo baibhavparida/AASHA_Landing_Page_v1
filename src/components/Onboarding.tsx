@@ -28,6 +28,7 @@ export interface OnboardingData {
   gender?: string;
   language?: string;
   maritalStatus?: string;
+  telegramUsername?: string;
   relationship?: string;
   lovedOneFirstName?: string;
   lovedOneLastName?: string;
