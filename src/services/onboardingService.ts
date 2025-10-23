@@ -403,6 +403,7 @@ async function saveLovedOneRegistration(data: OnboardingData) {
       marital_status: data.lovedOneMaritalStatus!,
       call_time_preference: callTimePreference,
       relationship_to_caregiver: data.relationship!,
+      telegram_username: data.lovedOneTelegramUsername || null,
     })
     .select()
     .single();
