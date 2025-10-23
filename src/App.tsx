@@ -39,6 +39,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const [isFamilyMember, setIsFamilyMember] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
+  const [isOnboardingComplete, setIsOnboardingComplete] = React.useState(false);
 
   React.useEffect(() => {
     console.log('App mounted, checking authentication...');
@@ -46,16 +47,18 @@ function App() {
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('Auth state changed:', event, !!session);
-      setIsAuthenticated(!!session);
-      if (session) {
-        checkUserType();
+      if (!showOnboarding) {
+        setIsAuthenticated(!!session);
+        if (session) {
+          checkUserType();
+        }
       }
     });
 
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, []);
+  }, [showOnboarding]);
 
   React.useEffect(() => {
     if (loading) {
@@ -986,7 +989,17 @@ function App() {
 
       {showOnboarding && (
         <Onboarding
-          onClose={() => setShowOnboarding(false)}
+          onClose={() => {
+            setShowOnboarding(false);
+            setIsOnboardingComplete(true);
+            setTimeout(async () => {
+              const { data: { session } } = await supabase.auth.getSession();
+              setIsAuthenticated(!!session);
+              if (session) {
+                await checkUserType();
+              }
+            }, 100);
+          }}
           onOpenLogin={() => setShowLogin(true)}
         />
       )}
