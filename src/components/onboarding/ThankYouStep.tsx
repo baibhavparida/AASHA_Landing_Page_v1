@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CheckCircle, Phone, Mail, Loader2, Bell } from 'lucide-react';
+import { CheckCircle, Phone, Mail, Loader2, Bell, MessageCircle } from 'lucide-react';
 import { OnboardingData } from '../Onboarding';
 import { saveOnboardingData } from '../../services/onboardingService';
 
@@ -93,46 +93,41 @@ const ThankYouStep: React.FC<ThankYouStepProps> = ({ data, onClose }) => {
       </div>
 
       <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-        {isElderlyUser ? 'Welcome to Aasha!' : 'Registration Complete!'}
+        Thank you for registering!
       </h2>
-      <p className="text-xl text-gray-600 mb-12">
+      <p className="text-xl text-gray-600 mb-8">
         {isElderlyUser
-          ? `Thank you for registering, ${data.firstName}! We're excited to be your companion.`
-          : `Thank you, ${data.firstName}! You've successfully set up Aasha for ${lovedOneName}.`
+          ? `We're excited to be your companion, ${data.firstName}!`
+          : `You've successfully set up Aasha for ${lovedOneName}.`
         }
       </p>
 
-      {isElderlyUser ? (
-        <div className="bg-gradient-to-br from-[#F35E4A] to-[#e54d37] rounded-2xl p-8 mb-8 text-white">
-          <div className="flex items-center justify-center space-x-3 mb-4">
-            <Phone className="h-8 w-8" />
-            <h3 className="text-2xl font-bold">Aasha is calling you now!</h3>
-          </div>
-          <p className="text-lg text-white/90 mb-2">
-            Your first conversation will begin within the next minute.
-          </p>
-          <p className="text-white/80">
-            Please keep your phone nearby and answer when Aasha calls.
-          </p>
+      <div className="bg-gradient-to-br from-[#F35E4A] to-[#e54d37] rounded-2xl p-8 mb-8 text-white">
+        <div className="flex items-center justify-center space-x-3 mb-4">
+          <Phone className="h-8 w-8" />
+          <h3 className="text-2xl font-bold">
+            {isElderlyUser ? 'You will receive a call from Aasha within the next 2 mins!' : `${lovedOneName} will receive a call from Aasha within the next 2 mins!`}
+          </h3>
         </div>
-      ) : (
+        <p className="text-lg text-white/90">
+          Please keep your phone nearby and answer when Aasha calls.
+        </p>
+      </div>
+
+      <a
+        href="https://t.me/aashabpbot?start=start"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center space-x-3 bg-[#0088cc] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#0077b3] transition-all shadow-lg mb-8"
+      >
+        <MessageCircle className="h-6 w-6" />
+        <span>Connect with Aasha on Telegram</span>
+      </a>
+
+      {!isElderlyUser && (
         <div className="bg-white rounded-2xl p-8 border-2 border-gray-200 mb-8 text-left">
           <h3 className="text-2xl font-bold text-gray-900 mb-6">What happens next?</h3>
           <div className="space-y-6">
-            <div className="flex items-start space-x-4">
-              <div className="bg-[#F35E4A] rounded-full p-2 mt-1">
-                <Phone className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 mb-1">
-                  Aasha will call {lovedOneName}
-                </h4>
-                <p className="text-gray-600">
-                  Based on the preferences you set, {lovedOneName} will receive calls during their preferred time.
-                </p>
-              </div>
-            </div>
-
             <div className="flex items-start space-x-4">
               <div className="bg-[#F35E4A] rounded-full p-2 mt-1">
                 <CheckCircle className="h-5 w-5 text-white" />
