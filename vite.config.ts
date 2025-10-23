@@ -13,6 +13,12 @@ export default defineConfig({
     strictPort: false,
     cors: true,
   },
+  preview: {
+    host: '0.0.0.0',
+    port: 4173,
+    strictPort: false,
+    cors: true,
+  },
   build: {
     outDir: 'dist',
     sourcemap: true,
