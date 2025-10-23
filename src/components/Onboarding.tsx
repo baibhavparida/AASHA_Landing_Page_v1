@@ -101,7 +101,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onClose, onOpenLogin }) => {
 
   const getTotalSteps = () => {
     if (data.registrationType === 'loved-one') {
-      return data.lovedOnePhoneVerified ? 8 : 9;
+      return data.lovedOnePhoneVerified ? 9 : 10;
     }
     return 8;
   };
