@@ -6,7 +6,9 @@ import {
   TrendingUp,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Phone,
+  Loader2
 } from 'lucide-react';
 import { getMedications, getCalls, getSpecialEvents, getMedicationTracking } from '../../services/dashboardService';
 
@@ -30,6 +32,9 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
   const [todayMedications, setTodayMedications] = useState<any[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [initiatingCall, setInitiatingCall] = useState(false);
+  const [callError, setCallError] = useState<string | null>(null);
+  const [callSuccess, setCallSuccess] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -84,6 +89,39 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
     return timeMap[elderlyProfile.call_time_preference] || elderlyProfile.call_time_preference;
   };
 
+  const handleTalkToAasha = async () => {
+    try {
+      setInitiatingCall(true);
+      setCallError(null);
+      setCallSuccess(false);
+
+      const response = await fetch('https://sunitaai.app.n8n.cloud/webhook/Initiate_routine_call', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          elderly_profile_id: elderlyProfile.id,
+          first_name: elderlyProfile.first_name,
+          last_name: elderlyProfile.last_name,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to initiate call');
+      }
+
+      setCallSuccess(true);
+      setTimeout(() => setCallSuccess(false), 5000);
+    } catch (error) {
+      console.error('Error initiating call:', error);
+      setCallError('Failed to initiate call. Please try again.');
+      setTimeout(() => setCallError(null), 5000);
+    } finally {
+      setInitiatingCall(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -96,12 +134,43 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
     <div className="space-y-8">
       {/* Welcome Section */}
       <div className="bg-white rounded-2xl shadow-md p-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
-          {getGreeting()}, {elderlyProfile.first_name}!
-        </h2>
-        <p className="text-lg text-gray-600">
-          Here's your daily overview. Have a wonderful day!
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              {getGreeting()}, {elderlyProfile.first_name}!
+            </h2>
+            <p className="text-lg text-gray-600">
+              Here's your daily overview. Have a wonderful day!
+            </p>
+          </div>
+          <button
+            onClick={handleTalkToAasha}
+            disabled={initiatingCall}
+            className="flex items-center space-x-2 bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+          >
+            {initiatingCall ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                <span>Calling...</span>
+              </>
+            ) : (
+              <>
+                <Phone className="h-5 w-5" />
+                <span>Talk to Aasha</span>
+              </>
+            )}
+          </button>
+        </div>
+        {callSuccess && (
+          <div className="mt-4 bg-green-50 border-l-4 border-green-500 rounded p-4">
+            <p className="text-green-800 font-semibold">Call initiated! Aasha will call you shortly.</p>
+          </div>
+        )}
+        {callError && (
+          <div className="mt-4 bg-red-50 border-l-4 border-red-500 rounded p-4">
+            <p className="text-red-800 font-semibold">{callError}</p>
+          </div>
+        )}
       </div>
 
       {/* Quick Stats */}
@@ -149,22 +218,12 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
 
       {/* Next Call Schedule */}
       <div className="bg-white rounded-2xl shadow-md p-8">
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center mb-4">
-              <Clock className="h-6 w-6 text-[#F35E4A] mr-3" />
-              <h3 className="text-xl font-bold text-gray-900">Your Next Aasha Call</h3>
-            </div>
-            <p className="text-base text-gray-700 mb-2">Preferred Time: {getCallTimeDisplay()}</p>
-            <p className="text-sm text-gray-600">Aasha will call you during your preferred time window</p>
-          </div>
-          <button
-            onClick={() => onNavigate('call-schedule')}
-            className="bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all"
-          >
-            Update Schedule
-          </button>
+        <div className="flex items-center mb-4">
+          <Clock className="h-6 w-6 text-[#F35E4A] mr-3" />
+          <h3 className="text-xl font-bold text-gray-900">Your Next Aasha Call</h3>
         </div>
+        <p className="text-base text-gray-700 mb-2">Preferred Time: {getCallTimeDisplay()}</p>
+        <p className="text-sm text-gray-600">Aasha will call you during your preferred time window</p>
       </div>
 
       {/* Two Column Layout */}
