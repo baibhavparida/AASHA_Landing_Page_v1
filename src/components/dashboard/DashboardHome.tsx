@@ -11,6 +11,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { getMedications, getCalls, getSpecialEvents, getMedicationTracking } from '../../services/dashboardService';
+import { supabase } from '../../lib/supabase';
 
 interface DashboardHomeProps {
   elderlyProfile: {
@@ -95,6 +96,19 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
       setCallError(null);
       setCallSuccess(false);
 
+      // Fetch comprehensive user data from the database
+      // Call the database function to get all user data
+      const { data: fullProfileData, error: dbError } = await supabase
+        .rpc('get_elderly_profile_full_details', {
+          p_elderly_profile_id: elderlyProfile.id
+        });
+
+      if (dbError) {
+        console.error('Error fetching profile data:', dbError);
+        throw new Error('Failed to fetch user data');
+      }
+
+      // Send all available data to the webhook
       const response = await fetch('https://sunitaai.app.n8n.cloud/webhook/Initiate_routine_call', {
         method: 'POST',
         headers: {
@@ -104,6 +118,9 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
           elderly_profile_id: elderlyProfile.id,
           first_name: elderlyProfile.first_name,
           last_name: elderlyProfile.last_name,
+          call_time_preference: elderlyProfile.call_time_preference,
+          // Include all comprehensive data from database
+          profile_data: fullProfileData || {},
         }),
       });
 
