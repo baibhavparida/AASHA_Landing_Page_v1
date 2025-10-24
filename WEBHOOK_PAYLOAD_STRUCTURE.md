@@ -55,18 +55,27 @@ When a user clicks "Talk to Aasha", the following comprehensive data is sent:
         "interest": "reading|music|cooking|travel|photography|art-crafts|gardening|news|health|devotional|movies|sports"
       }
     ],
-    "recent_calls": [
+    "all_calls": [
       {
         "call_id": "uuid",
         "retell_call_id": "string|null",
         "call_type": "onboarding|daily_checkin",
         "call_status": "successful|voicemail|failed",
         "created_at": "timestamp",
+        "started_at": "timestamp",
         "ended_at": "timestamp|null",
         "duration_seconds": "number",
-        "call_summary": "string|null",
+        "agent_id": "string|null",
+        "call_summary": "string",
         "user_sentiment": "Positive|Negative|Neutral|null",
-        "transcript_summary": "string|null"
+        "call_successful": "boolean",
+        "in_voicemail": "boolean",
+        "medicine_taken": "boolean|null",
+        "custom_analysis_data": "object",
+        "transcript_text": "string|null (full conversation transcript)",
+        "speaker_segments": "array (structured transcript with speaker IDs)",
+        "llm_call_summary": "string|null (AI-generated detailed summary)",
+        "raw_webhook_data": "object (complete original webhook payload)"
       }
     ],
     "caregiver": {
@@ -110,11 +119,24 @@ Array of all medications the elderly user is taking:
 Array of elderly user's interests and hobbies:
 - Categories include: reading, music, cooking, travel, photography, art-crafts, gardening, news, health, devotional, movies, sports
 
-#### recent_calls
-Array of the last 10 calls from the past 7 days:
-- Call identification (call_id, retell_call_id)
-- Call metadata (type, status, timestamps, duration)
-- Call analysis (summary, sentiment, transcript summary)
+#### all_calls
+Array of ALL calls for the elderly user (no time or count limits):
+- **Call identification**: call_id, retell_call_id, agent_id
+- **Call metadata**: type, status, timestamps (created_at, started_at, ended_at), duration
+- **Call analysis**:
+  - call_summary (human-readable summary)
+  - user_sentiment (Positive, Negative, Neutral)
+  - call_successful (whether call completed successfully)
+  - in_voicemail (whether call went to voicemail)
+  - medicine_taken (medication adherence from call)
+  - custom_analysis_data (any additional analysis fields)
+- **Transcript data**:
+  - transcript_text (complete conversation transcript)
+  - speaker_segments (structured transcript with speaker identification)
+  - llm_call_summary (AI-generated detailed summary from Retell)
+- **Raw data**: raw_webhook_data (complete original webhook payload for reference)
+
+**Note**: This includes the complete call history, providing full context for AI conversations
 
 #### caregiver
 If the elderly user was registered by a family member, this contains the caregiver's information:
@@ -176,18 +198,62 @@ If the elderly user was registered by a family member, this contains the caregiv
         "interest": "music"
       }
     ],
-    "recent_calls": [
+    "all_calls": [
       {
         "call_id": "cc0e8400-e29b-41d4-a716-446655440007",
         "retell_call_id": "call_12345abc",
         "call_type": "daily_checkin",
         "call_status": "successful",
         "created_at": "2025-10-23T08:00:00Z",
+        "started_at": "2025-10-23T08:00:00Z",
         "ended_at": "2025-10-23T08:12:30Z",
         "duration_seconds": 750,
+        "agent_id": "agent_abc123",
         "call_summary": "User reported taking medications on time. Discussed gardening plans for the weekend.",
         "user_sentiment": "Positive",
-        "transcript_summary": "Morning check-in call. User confirmed medication adherence and shared excitement about gardening."
+        "call_successful": true,
+        "in_voicemail": false,
+        "medicine_taken": true,
+        "custom_analysis_data": {
+          "mood": "cheerful",
+          "health_status": "good"
+        },
+        "transcript_text": "Agent: Good morning John! How are you feeling today?\nJohn: I'm feeling great! Just finished my morning walk in the garden.\nAgent: That's wonderful! Have you taken your medications today?\nJohn: Yes, I took both my Aspirin and Metformin with breakfast.\nAgent: Excellent! Tell me more about your gardening plans...",
+        "speaker_segments": [
+          {"role": "agent", "text": "Good morning John! How are you feeling today?", "timestamp": 0},
+          {"role": "user", "text": "I'm feeling great! Just finished my morning walk in the garden.", "timestamp": 3.2}
+        ],
+        "llm_call_summary": "Morning check-in call. User confirmed medication adherence and shared excitement about gardening. Mood was positive throughout the conversation. No health concerns raised.",
+        "raw_webhook_data": {
+          "call_id": "call_12345abc",
+          "end_timestamp": 1698048750,
+          "call_analysis": {
+            "call_summary": "User reported taking medications on time. Discussed gardening plans for the weekend."
+          }
+        }
+      },
+      {
+        "call_id": "dd0e8400-e29b-41d4-a716-446655440008",
+        "retell_call_id": "call_12345def",
+        "call_type": "daily_checkin",
+        "call_status": "successful",
+        "created_at": "2025-10-22T08:00:00Z",
+        "started_at": "2025-10-22T08:00:00Z",
+        "ended_at": "2025-10-22T08:10:15Z",
+        "duration_seconds": 615,
+        "agent_id": "agent_abc123",
+        "call_summary": "Brief check-in. User confirmed taking morning medications. Mentioned plans to read a new book.",
+        "user_sentiment": "Positive",
+        "call_successful": true,
+        "in_voicemail": false,
+        "medicine_taken": true,
+        "custom_analysis_data": {},
+        "transcript_text": "Agent: Hello John! How's your morning going?\nJohn: Good morning! I'm doing well...",
+        "speaker_segments": [
+          {"role": "agent", "text": "Hello John! How's your morning going?", "timestamp": 0}
+        ],
+        "llm_call_summary": "Brief morning check-in. User confirmed medication adherence. Expressed interest in reading.",
+        "raw_webhook_data": {}
       }
     ],
     "caregiver": null
@@ -205,11 +271,37 @@ The webhook call is implemented in:
 
 All profile data is retrieved using the Supabase RPC function:
 - **Function**: `get_elderly_profile_full_details(p_elderly_profile_id UUID)`
-- **Location**: Defined in migration `/supabase/migrations/20251011173907_fix_get_elderly_profile_details_query_structure.sql`
+- **Latest Version**: Defined in migration `/supabase/migrations/20251024000000_update_webhook_payload_to_include_all_calls.sql`
+- **Previous Version**: `/supabase/migrations/20251011173907_fix_get_elderly_profile_details_query_structure.sql`
 
 This function performs a comprehensive query across multiple tables:
-- elderly_profiles
-- medications
-- interests
-- calls (with call_analysis and call_transcripts)
-- profiles (for caregiver information)
+- **elderly_profiles** - Core profile information
+- **medications** - All medications with dosage and timing
+- **interests** - User hobbies and interests
+- **calls** - Complete call history (ALL calls, no time or count limits)
+- **call_analysis** - AI-generated summaries, sentiment, medication adherence
+- **call_transcripts** - Full conversation transcripts and LLM summaries
+- **profiles** - Caregiver information (if applicable)
+
+## Recent Changes (October 24, 2025)
+
+The webhook payload has been enhanced to include:
+- **All call history** (previously limited to last 10 calls from past 7 days)
+- **Complete call details**:
+  - Full conversation transcripts (transcript_text)
+  - Structured speaker segments
+  - AI-generated detailed summaries (llm_call_summary)
+  - Call success/voicemail status
+  - Medication adherence per call
+  - Custom analysis data
+  - Raw webhook data for debugging
+- **Better AI context**: The complete call history enables better conversation continuity and personalization
+
+## Benefits of Enhanced Payload
+
+1. **Complete Context**: AI has access to entire conversation history
+2. **Better Personalization**: Can reference topics from any previous conversation
+3. **Medication Tracking**: Full medication adherence history across all calls
+4. **Sentiment Trends**: Track user sentiment over time
+5. **Debugging Support**: Raw webhook data available for troubleshooting
+6. **Transcript Access**: Full conversation transcripts for detailed analysis
