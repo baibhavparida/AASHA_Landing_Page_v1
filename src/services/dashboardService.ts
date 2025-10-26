@@ -20,7 +20,7 @@ export async function getElderlyProfileForUser() {
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('id, elderly_profile_id')
+    .select('id')
     .eq('id', profileId)
     .maybeSingle();
 
@@ -33,23 +33,7 @@ export async function getElderlyProfileForUser() {
     throw new Error('Profile not found. Please complete registration.');
   }
 
-  // If elderly_profile_id exists, use it directly
-  if (profile.elderly_profile_id) {
-    const { data, error } = await supabase
-      .from('elderly_profiles')
-      .select('*')
-      .eq('id', profile.elderly_profile_id)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Error fetching elderly profile:', error);
-      throw error;
-    }
-
-    return data;
-  }
-
-  // Otherwise, try to find by profile_id (backward compatibility)
+  // Find elderly profile by profile_id
   const { data, error } = await supabase
     .from('elderly_profiles')
     .select('*')
