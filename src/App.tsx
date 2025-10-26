@@ -77,6 +77,18 @@ function App() {
   const checkAuth = async () => {
     try {
       console.log('Checking authentication session...');
+
+      // Check localStorage first for demo auth
+      const profileId = localStorage.getItem('aasha_profile_id');
+      if (profileId) {
+        console.log('Found profile ID in localStorage:', profileId);
+        setIsAuthenticated(true);
+        await checkUserTypeByProfileId(profileId);
+        setLoading(false);
+        return;
+      }
+
+      // Fallback to Supabase auth
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {
@@ -114,6 +126,22 @@ function App() {
       }
     } catch (error) {
       console.error('Error checking user type:', error);
+    }
+  };
+
+  const checkUserTypeByProfileId = async (profileId: string) => {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('registration_type')
+        .eq('id', profileId)
+        .maybeSingle();
+
+      if (profile) {
+        setIsFamilyMember(profile.registration_type === 'loved-one');
+      }
+    } catch (error) {
+      console.error('Error checking user type by profile ID:', error);
     }
   };
 
