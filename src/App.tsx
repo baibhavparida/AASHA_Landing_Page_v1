@@ -296,9 +296,9 @@ function App() {
               </div>
             </div>
             <div className="relative">
-              <img 
-                src="https://i.postimg.cc/bNYzK9CP/AASHA-Hero.png" 
-                alt="Happy elderly person using technology" 
+              <img
+                src="https://i.postimg.cc/qvDGL71S/8beead3a-c7d8-43fc-936a-d06eaf85b99d-1.png"
+                alt="Happy elderly person using technology"
                 className="rounded-2xl shadow-lg w-full h-auto object-cover"
               />
             </div>
