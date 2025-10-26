@@ -25,7 +25,7 @@ export default function LoginModal({ onClose, onLoginSuccess }: LoginModalProps)
       // Check if user exists in profiles table
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('id, registration_type, elderly_profile_id')
+        .select('id, registration_type')
         .eq('phone_number', phoneNumber)
         .eq('country_code', countryCode)
         .maybeSingle();
