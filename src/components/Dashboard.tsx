@@ -162,7 +162,7 @@ const Dashboard: React.FC = () => {
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <img src="/Aasha Logo.png" alt="Aasha Logo" className="h-8" />
+                <img src="https://i.postimg.cc/c4k6zN0y/Aasha-Logo.png" alt="Aasha Logo" className="h-10" />
               </div>
               <button
                 onClick={() => setIsSidebarOpen(false)}
