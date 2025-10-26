@@ -12,24 +12,32 @@ export async function getElderlyProfilesForFamily() {
   const profileId = localStorage.getItem('aasha_profile_id');
 
   if (!profileId) {
+    console.error('No profile ID in localStorage');
     throw new Error('User not authenticated');
   }
 
+  console.log('Loading elderly profiles for family member:', profileId);
+
+  // Check if profile exists in profiles table
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('id')
+    .select('id, registration_type')
     .eq('id', profileId)
     .maybeSingle();
 
   if (profileError) {
-    console.error('Error checking profile:', profileError);
-    throw profileError;
+    console.error('Error checking profile in profiles table:', profileError);
+    throw new Error('Failed to verify user profile. Please try logging in again.');
   }
 
   if (!profile) {
+    console.error('Profile not found in profiles table for ID:', profileId);
     throw new Error('Profile not found. Please complete registration.');
   }
 
+  console.log('Profile found with registration_type:', profile.registration_type);
+
+  // Find elderly profiles managed by this family member (for 'loved-one' registration)
   const { data, error } = await supabase
     .from('elderly_profiles')
     .select('*')
@@ -37,10 +45,16 @@ export async function getElderlyProfilesForFamily() {
 
   if (error) {
     console.error('Error fetching elderly profiles:', error);
-    throw error;
+    throw new Error('Failed to load profile data. Please try again.');
   }
 
-  return data || [];
+  if (!data || data.length === 0) {
+    console.error('No elderly profiles found for caregiver_profile_id:', profileId);
+    throw new Error('Your profile setup is incomplete. Please complete the registration process.');
+  }
+
+  console.log('Elderly profiles loaded successfully. Count:', data.length);
+  return data;
 }
 
 export async function getElderlyProfileForFamily(elderlyProfileId: string) {

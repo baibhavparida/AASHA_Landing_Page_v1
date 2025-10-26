@@ -22,16 +22,58 @@ export default function LoginModal({ onClose, onLoginSuccess }: LoginModalProps)
     setLoading(true);
 
     try {
-      // Check if user exists (phone_number is stored WITHOUT country code)
-      const { data: profile } = await supabase
+      // Check if user exists in profiles table
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('id, registration_type')
+        .select('id, registration_type, elderly_profile_id')
         .eq('phone_number', phoneNumber)
         .eq('country_code', countryCode)
         .maybeSingle();
 
+      if (profileError) {
+        console.error('Error checking profile:', profileError);
+        throw new Error('Failed to verify phone number. Please try again.');
+      }
+
       if (!profile) {
         setError('No account found with this phone number. Please sign up first.');
+        setLoading(false);
+        return;
+      }
+
+      // Verify that elderly_profile exists based on registration type
+      let elderlyProfileExists = false;
+
+      if (profile.registration_type === 'myself') {
+        // For 'myself' registration, check if elderly_profile exists with profile_id
+        const { data: elderlyProfile, error: elderlyError } = await supabase
+          .from('elderly_profiles')
+          .select('id')
+          .eq('profile_id', profile.id)
+          .maybeSingle();
+
+        if (elderlyError) {
+          console.error('Error checking elderly profile:', elderlyError);
+        }
+
+        elderlyProfileExists = !!elderlyProfile;
+      } else if (profile.registration_type === 'loved-one') {
+        // For 'loved-one' registration, check if elderly_profile exists with caregiver_profile_id
+        const { data: elderlyProfiles, error: elderlyError } = await supabase
+          .from('elderly_profiles')
+          .select('id')
+          .eq('caregiver_profile_id', profile.id)
+          .limit(1);
+
+        if (elderlyError) {
+          console.error('Error checking elderly profiles:', elderlyError);
+        }
+
+        elderlyProfileExists = !!elderlyProfiles && elderlyProfiles.length > 0;
+      }
+
+      if (!elderlyProfileExists) {
+        setError('Your registration is incomplete. Please complete the registration process to access your dashboard.');
         setLoading(false);
         return;
       }

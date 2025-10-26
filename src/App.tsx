@@ -114,6 +114,8 @@ function App() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      console.log('Checking user type for user:', user.id);
+
       // Check registration_type in profiles table
       const { data: profile } = await supabase
         .from('profiles')
@@ -121,27 +123,109 @@ function App() {
         .eq('id', user.id)
         .maybeSingle();
 
-      if (profile) {
-        setIsFamilyMember(profile.registration_type === 'loved-one');
+      if (!profile) {
+        console.error('Profile not found for authenticated user:', user.id);
+        setIsAuthenticated(false);
+        return;
+      }
+
+      console.log('User registration type:', profile.registration_type);
+
+      // Verify elderly_profile exists based on registration type
+      if (profile.registration_type === 'myself') {
+        const { data: elderlyProfile } = await supabase
+          .from('elderly_profiles')
+          .select('id')
+          .eq('profile_id', user.id)
+          .maybeSingle();
+
+        if (!elderlyProfile) {
+          console.error('Elderly profile not found for profile_id:', user.id);
+          setIsAuthenticated(false);
+          return;
+        }
+        setIsFamilyMember(false);
+      } else if (profile.registration_type === 'loved-one') {
+        const { data: elderlyProfiles } = await supabase
+          .from('elderly_profiles')
+          .select('id')
+          .eq('caregiver_profile_id', user.id)
+          .limit(1);
+
+        if (!elderlyProfiles || elderlyProfiles.length === 0) {
+          console.error('No elderly profiles found for caregiver_profile_id:', user.id);
+          setIsAuthenticated(false);
+          return;
+        }
+        setIsFamilyMember(true);
       }
     } catch (error) {
       console.error('Error checking user type:', error);
+      setIsAuthenticated(false);
     }
   };
 
   const checkUserTypeByProfileId = async (profileId: string) => {
     try {
+      console.log('Checking user type by profile ID:', profileId);
+
       const { data: profile } = await supabase
         .from('profiles')
         .select('registration_type')
         .eq('id', profileId)
         .maybeSingle();
 
-      if (profile) {
-        setIsFamilyMember(profile.registration_type === 'loved-one');
+      if (!profile) {
+        console.error('Profile not found for ID:', profileId);
+        localStorage.removeItem('aasha_profile_id');
+        localStorage.removeItem('aasha_phone_number');
+        localStorage.removeItem('aasha_country_code');
+        setIsAuthenticated(false);
+        return;
+      }
+
+      console.log('User registration type:', profile.registration_type);
+
+      // Verify elderly_profile exists based on registration type
+      if (profile.registration_type === 'myself') {
+        const { data: elderlyProfile } = await supabase
+          .from('elderly_profiles')
+          .select('id')
+          .eq('profile_id', profileId)
+          .maybeSingle();
+
+        if (!elderlyProfile) {
+          console.error('Elderly profile not found for profile_id:', profileId);
+          localStorage.removeItem('aasha_profile_id');
+          localStorage.removeItem('aasha_phone_number');
+          localStorage.removeItem('aasha_country_code');
+          setIsAuthenticated(false);
+          return;
+        }
+        setIsFamilyMember(false);
+      } else if (profile.registration_type === 'loved-one') {
+        const { data: elderlyProfiles } = await supabase
+          .from('elderly_profiles')
+          .select('id')
+          .eq('caregiver_profile_id', profileId)
+          .limit(1);
+
+        if (!elderlyProfiles || elderlyProfiles.length === 0) {
+          console.error('No elderly profiles found for caregiver_profile_id:', profileId);
+          localStorage.removeItem('aasha_profile_id');
+          localStorage.removeItem('aasha_phone_number');
+          localStorage.removeItem('aasha_country_code');
+          setIsAuthenticated(false);
+          return;
+        }
+        setIsFamilyMember(true);
       }
     } catch (error) {
       console.error('Error checking user type by profile ID:', error);
+      localStorage.removeItem('aasha_profile_id');
+      localStorage.removeItem('aasha_phone_number');
+      localStorage.removeItem('aasha_country_code');
+      setIsAuthenticated(false);
     }
   };
 
