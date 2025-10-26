@@ -911,7 +911,6 @@ function App() {
       {/* Final CTA Section */}
       <section className="py-20 bg-[#F35E4A] text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-5xl font-bold mb-4">Ready to Begin Your Journey?</h2>
           <h2 className="text-3xl md:text-5xl font-bold mb-4">Ready to Begin Your Journey?</h2>
           <p className="text-xl text-white/80 mb-8">
             Join thousands of people finding joy, families who have found companionship and joy with AASHA.
@@ -932,38 +931,38 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#59231B] text-white py-12">
+      <footer className="bg-[#F4F2EE] text-gray-900 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div className="text-center">
               <div className="flex items-center justify-center mb-4">
                 <img src="https://i.postimg.cc/c4k6zN0y/Aasha-Logo.png" alt="Aasha Logo" className="h-10" />
               </div>
-              <p className="text-white/70 mb-4">
+              <p className="text-gray-600 mb-4">
                 Your friendly companion for daily support, wellness, and meaningful connections.
               </p>
             </div>
             <div className="text-center">
               <h3 className="text-xl font-semibold mb-4">Product</h3>
-              <ul className="space-y-2 text-white/70">
-                <li><a href="#" className="hover:text-white transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">How it Works</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
+              <ul className="space-y-2 text-gray-600">
+                <li><a href="#" className="hover:text-[#F35E4A] transition-colors">Features</a></li>
+                <li><a href="#" className="hover:text-[#F35E4A] transition-colors">How it Works</a></li>
+                <li><a href="#" className="hover:text-[#F35E4A] transition-colors">Pricing</a></li>
+                <li><a href="#" className="hover:text-[#F35E4A] transition-colors">Security</a></li>
               </ul>
             </div>
             <div className="text-center">
               <h3 className="text-xl font-semibold mb-4">Support</h3>
-              <ul className="space-y-2 text-white/70">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+              <ul className="space-y-2 text-gray-600">
+                <li><a href="#" className="hover:text-[#F35E4A] transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-[#F35E4A] transition-colors">Contact Us</a></li>
+                <li><a href="#" className="hover:text-[#F35E4A] transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-[#F35E4A] transition-colors">Terms of Service</a></li>
               </ul>
             </div>
             <div className="text-center">
               <h3 className="text-xl font-semibold mb-4">Contact</h3>
-              <div className="space-y-2 text-white/70 flex flex-col items-center">
+              <div className="space-y-2 text-gray-600 flex flex-col items-center">
                 <div className="flex items-center justify-center">
                   <Mail className="h-4 w-4 mr-2 text-[#F35E4A]" />
                   <span>hello@aasha.com</span>
@@ -979,7 +978,7 @@ function App() {
               </div>
             </div>
           </div>
-          <div className="border-t border-white/20 mt-8 pt-8 text-center text-white/60">
+          <div className="border-t border-gray-300 mt-8 pt-8 text-center text-gray-600">
             <p>&copy; 2025 AASHA. All rights reserved.</p>
           </div>
         </div>
