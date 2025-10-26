@@ -102,35 +102,24 @@ function App() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: elderlyProfile, error: elderlyError } = await supabase
-        .from('elderly_profiles')
-        .select('id, profile_id, caregiver_profile_id')
-        .eq('profile_id', user.id)
+      // Check registration_type in profiles table
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('registration_type')
+        .eq('id', user.id)
         .maybeSingle();
 
-      if (elderlyError) {
-        console.error('Error checking elderly profile:', elderlyError);
+      if (profile) {
+        setIsFamilyMember(profile.registration_type === 'loved-one');
       }
-
-      if (elderlyProfile) {
-        setIsFamilyMember(false);
-        return;
-      }
-
-      const { data: familyProfile, error: familyError } = await supabase
-        .from('elderly_profiles')
-        .select('id')
-        .eq('caregiver_profile_id', user.id)
-        .maybeSingle();
-
-      if (familyError) {
-        console.error('Error checking family profile:', familyError);
-      }
-
-      setIsFamilyMember(!!familyProfile);
     } catch (error) {
       console.error('Error checking user type:', error);
     }
+  };
+
+  const handleLoginSuccess = (userType: 'elderly' | 'family') => {
+    setIsFamilyMember(userType === 'family');
+    setIsAuthenticated(true);
   };
 
   if (loading) {
@@ -1012,7 +1001,10 @@ function App() {
       )}
 
       {showLogin && (
-        <LoginModal onClose={() => setShowLogin(false)} />
+        <LoginModal
+          onClose={() => setShowLogin(false)}
+          onLoginSuccess={handleLoginSuccess}
+        />
       )}
     </div>
   );

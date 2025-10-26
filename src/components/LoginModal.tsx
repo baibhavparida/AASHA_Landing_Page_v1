@@ -4,17 +4,23 @@ import { supabase } from '../lib/supabase';
 
 interface LoginModalProps {
   onClose: () => void;
+  onLoginSuccess: (userType: 'elderly' | 'family') => void;
 }
 
-export default function LoginModal({ onClose }: LoginModalProps) {
-  const [step, setStep] = React.useState<'phone' | 'otp'>('phone');
+function generatePassword(phoneNumber: string): string {
+  const hash = phoneNumber.split('').reduce((acc, char) => {
+    return ((acc << 5) - acc) + char.charCodeAt(0);
+  }, 0);
+  return `aasha_${Math.abs(hash)}_${phoneNumber.slice(-4)}_temp_pw_2025`;
+}
+
+export default function LoginModal({ onClose, onLoginSuccess }: LoginModalProps) {
   const [phoneNumber, setPhoneNumber] = React.useState('');
-  const [countryCode, setCountryCode] = React.useState('+1');
-  const [otp, setOtp] = React.useState('');
+  const [countryCode, setCountryCode] = React.useState('+91');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
 
-  const handleSendOTP = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -22,39 +28,39 @@ export default function LoginModal({ onClose }: LoginModalProps) {
     try {
       const fullPhone = `${countryCode}${phoneNumber}`;
 
-      const { error: signInError } = await supabase.auth.signInWithOtp({
-        phone: fullPhone,
+      // Check if user exists
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id, registration_type')
+        .eq('phone_number', fullPhone)
+        .maybeSingle();
+
+      if (!profile) {
+        setError('No account found with this phone number. Please sign up first.');
+        setLoading(false);
+        return;
+      }
+
+      // Generate password and sign in
+      const password = generatePassword(phoneNumber);
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: `${fullPhone}@aasha-temp.com`,
+        password: password,
       });
 
       if (signInError) throw signInError;
 
-      setStep('otp');
-    } catch (err: any) {
-      setError(err.message || 'Failed to send OTP. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+      if (!authData.user) {
+        throw new Error('Login failed');
+      }
 
-  const handleVerifyOTP = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+      // Determine user type based on registration_type
+      const userType = profile.registration_type === 'loved-one' ? 'family' : 'elderly';
 
-    try {
-      const fullPhone = `${countryCode}${phoneNumber}`;
-
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        phone: fullPhone,
-        token: otp,
-        type: 'sms',
-      });
-
-      if (verifyError) throw verifyError;
-
+      onLoginSuccess(userType);
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Invalid OTP. Please try again.');
+      setError(err.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -74,115 +80,57 @@ export default function LoginModal({ onClose }: LoginModalProps) {
         </div>
 
         <div className="p-6">
-          {step === 'phone' ? (
-            <form onSubmit={handleSendOTP} className="space-y-6">
-              <div>
-                <p className="text-gray-600 mb-6">
-                  Enter your phone number to receive a verification code.
-                </p>
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <p className="text-gray-600 mb-6">
+                Enter your phone number to login to your account.
+              </p>
 
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  Phone Number
-                </label>
-                <div className="flex gap-2">
-                  <select
-                    value={countryCode}
-                    onChange={(e) => setCountryCode(e.target.value)}
-                    className="w-24 px-3 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F35E4A] focus:border-transparent transition-all"
-                  >
-                    <option value="+1">+1</option>
-                    <option value="+91">+91</option>
-                  </select>
-                  <input
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                    placeholder="4086257375"
-                    required
-                    maxLength={10}
-                    className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F35E4A] focus:border-transparent transition-all"
-                  />
-                </div>
-              </div>
-
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <p className="text-red-700 text-sm">{error}</p>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading || phoneNumber.length !== 10}
-                className="w-full bg-[#F35E4A] text-white py-4 rounded-lg font-semibold hover:bg-[#e54d37] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
-              >
-                {loading ? (
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                ) : (
-                  <>
-                    Send Verification Code
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </>
-                )}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleVerifyOTP} className="space-y-6">
-              <div>
-                <p className="text-gray-600 mb-6">
-                  Enter the 6-digit code sent to {countryCode} {phoneNumber}
-                </p>
-
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
-                  Verification Code
-                </label>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">
+                Phone Number
+              </label>
+              <div className="flex gap-2">
+                <select
+                  value={countryCode}
+                  onChange={(e) => setCountryCode(e.target.value)}
+                  className="w-24 px-3 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F35E4A] focus:border-transparent transition-all"
+                >
+                  <option value="+1">+1</option>
+                  <option value="+91">+91</option>
+                </select>
                 <input
-                  type="text"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                  placeholder="000000"
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                  placeholder="4086257375"
                   required
-                  maxLength={6}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F35E4A] focus:border-transparent transition-all text-center text-2xl tracking-widest"
+                  maxLength={10}
+                  className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-[#F35E4A] focus:border-transparent transition-all"
                 />
               </div>
+            </div>
 
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <p className="text-red-700 text-sm">{error}</p>
-                </div>
-              )}
-
-              <div className="space-y-3">
-                <button
-                  type="submit"
-                  disabled={loading || otp.length !== 6}
-                  className="w-full bg-[#F35E4A] text-white py-4 rounded-lg font-semibold hover:bg-[#e54d37] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
-                >
-                  {loading ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  ) : (
-                    <>
-                      Verify & Login
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStep('phone');
-                    setOtp('');
-                    setError('');
-                  }}
-                  className="w-full text-[#F35E4A] py-2 font-semibold hover:underline"
-                >
-                  Change Phone Number
-                </button>
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-700 text-sm">{error}</p>
               </div>
-            </form>
-          )}
+            )}
+
+            <button
+              type="submit"
+              disabled={loading || phoneNumber.length !== 10}
+              className="w-full bg-[#F35E4A] text-white py-4 rounded-lg font-semibold hover:bg-[#e54d37] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg"
+            >
+              {loading ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              ) : (
+                <>
+                  Login
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </>
+              )}
+            </button>
+          </form>
         </div>
       </div>
     </div>
