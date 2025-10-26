@@ -168,8 +168,7 @@ const FamilyDashboard: React.FC = () => {
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <MessageCircle className="h-8 w-8 text-[#F35E4A]" />
-                <span className="ml-2 text-2xl font-bold text-gray-900">AASHA</span>
+                <img src="/Aasha Logo.png" alt="Aasha Logo" className="h-8" />
               </div>
               <button
                 onClick={() => setIsSidebarOpen(false)}
