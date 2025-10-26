@@ -26,13 +26,12 @@ export default function LoginModal({ onClose, onLoginSuccess }: LoginModalProps)
     setLoading(true);
 
     try {
-      const fullPhone = `${countryCode}${phoneNumber}`;
-
-      // Check if user exists
+      // Check if user exists (phone_number is stored WITHOUT country code)
       const { data: profile } = await supabase
         .from('profiles')
         .select('id, registration_type')
-        .eq('phone_number', fullPhone)
+        .eq('phone_number', phoneNumber)
+        .eq('country_code', countryCode)
         .maybeSingle();
 
       if (!profile) {
@@ -41,7 +40,8 @@ export default function LoginModal({ onClose, onLoginSuccess }: LoginModalProps)
         return;
       }
 
-      // Generate password and sign in
+      // Generate password and sign in (email uses full phone with country code)
+      const fullPhone = `${countryCode}${phoneNumber}`;
       const password = generatePassword(phoneNumber);
       const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
         email: `${fullPhone}@aasha-temp.com`,
