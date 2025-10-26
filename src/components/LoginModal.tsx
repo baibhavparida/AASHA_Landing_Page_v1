@@ -59,6 +59,11 @@ export default function LoginModal({ onClose, onLoginSuccess }: LoginModalProps)
       // Accept any OTP - bypass authentication for now
       // In production, you would verify the OTP here
 
+      // Store profile ID in localStorage for dashboard to use
+      localStorage.setItem('aasha_profile_id', profileData.id);
+      localStorage.setItem('aasha_phone_number', phoneNumber);
+      localStorage.setItem('aasha_country_code', countryCode);
+
       // Determine user type based on registration_type
       const userType = profileData.registration_type === 'loved-one' ? 'family' : 'elderly';
 

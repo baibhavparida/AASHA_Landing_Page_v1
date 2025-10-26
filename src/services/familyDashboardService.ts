@@ -8,16 +8,17 @@ type ActivityLog = Database['public']['Tables']['family_activity_log']['Row'];
 type ConversationPrompt = Database['public']['Tables']['conversation_prompts']['Row'];
 
 export async function getElderlyProfilesForFamily() {
-  const { data: { user } } = await supabase.auth.getUser();
+  // For demo purposes, use localStorage instead of auth
+  const profileId = localStorage.getItem('aasha_profile_id');
 
-  if (!user) {
+  if (!profileId) {
     throw new Error('User not authenticated');
   }
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('id')
-    .eq('id', user.id)
+    .eq('id', profileId)
     .maybeSingle();
 
   if (profileError) {
@@ -32,7 +33,7 @@ export async function getElderlyProfilesForFamily() {
   const { data, error } = await supabase
     .from('elderly_profiles')
     .select('*')
-    .eq('caregiver_profile_id', user.id);
+    .eq('caregiver_profile_id', profileId);
 
   if (error) {
     console.error('Error fetching elderly profiles:', error);
@@ -43,9 +44,10 @@ export async function getElderlyProfilesForFamily() {
 }
 
 export async function getElderlyProfileForFamily(elderlyProfileId: string) {
-  const { data: { user } } = await supabase.auth.getUser();
+  // For demo purposes, use localStorage instead of auth
+  const profileId = localStorage.getItem('aasha_profile_id');
 
-  if (!user) {
+  if (!profileId) {
     throw new Error('User not authenticated');
   }
 
@@ -53,7 +55,7 @@ export async function getElderlyProfileForFamily(elderlyProfileId: string) {
     .from('elderly_profiles')
     .select('*')
     .eq('id', elderlyProfileId)
-    .eq('caregiver_profile_id', user.id)
+    .eq('caregiver_profile_id', profileId)
     .maybeSingle();
 
   if (error) {
@@ -65,9 +67,10 @@ export async function getElderlyProfileForFamily(elderlyProfileId: string) {
 }
 
 export async function getFamilyAlerts(elderlyProfileId: string, unacknowledgedOnly = false) {
-  const { data: { user } } = await supabase.auth.getUser();
+  // For demo purposes, use localStorage instead of auth
+  const profileId = localStorage.getItem('aasha_profile_id');
 
-  if (!user) {
+  if (!profileId) {
     throw new Error('User not authenticated');
   }
 
@@ -75,7 +78,7 @@ export async function getFamilyAlerts(elderlyProfileId: string, unacknowledgedOn
     .from('family_member_alerts')
     .select('*')
     .eq('elderly_profile_id', elderlyProfileId)
-    .eq('family_member_id', user.id)
+    .eq('family_member_id', profileId)
     .order('created_at', { ascending: false });
 
   if (unacknowledgedOnly) {

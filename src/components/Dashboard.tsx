@@ -65,6 +65,11 @@ const Dashboard: React.FC = () => {
   };
 
   const handleLogout = async () => {
+    // Clear localStorage
+    localStorage.removeItem('aasha_profile_id');
+    localStorage.removeItem('aasha_phone_number');
+    localStorage.removeItem('aasha_country_code');
+
     await supabase.auth.signOut();
     window.location.href = '/';
   };

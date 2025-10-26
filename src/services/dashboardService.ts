@@ -11,16 +11,17 @@ type SpecialEvent = Database['public']['Tables']['special_events']['Row'];
 type MedicationTracking = Database['public']['Tables']['medication_tracking']['Row'];
 
 export async function getElderlyProfileForUser() {
-  const { data: { user } } = await supabase.auth.getUser();
+  // For demo purposes, use localStorage instead of auth
+  const profileId = localStorage.getItem('aasha_profile_id');
 
-  if (!user) {
+  if (!profileId) {
     throw new Error('User not authenticated');
   }
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('id')
-    .eq('id', user.id)
+    .select('id, elderly_profile_id')
+    .eq('id', profileId)
     .maybeSingle();
 
   if (profileError) {
@@ -32,10 +33,27 @@ export async function getElderlyProfileForUser() {
     throw new Error('Profile not found. Please complete registration.');
   }
 
+  // If elderly_profile_id exists, use it directly
+  if (profile.elderly_profile_id) {
+    const { data, error } = await supabase
+      .from('elderly_profiles')
+      .select('*')
+      .eq('id', profile.elderly_profile_id)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error fetching elderly profile:', error);
+      throw error;
+    }
+
+    return data;
+  }
+
+  // Otherwise, try to find by profile_id (backward compatibility)
   const { data, error } = await supabase
     .from('elderly_profiles')
     .select('*')
-    .eq('profile_id', user.id)
+    .eq('profile_id', profileId)
     .maybeSingle();
 
   if (error) {
