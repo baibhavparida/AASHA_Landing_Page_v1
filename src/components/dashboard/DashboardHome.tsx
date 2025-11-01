@@ -10,9 +10,10 @@ import {
   Check,
   X as XIcon,
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Heart
 } from 'lucide-react';
-import { getMedications, getCalls, getSpecialEvents } from '../../services/dashboardService';
+import { getMedications, getCalls, getSpecialEvents, getInterests } from '../../services/dashboardService';
 import { getDailyMedicineLogs } from '../../services/dailyMedicineLogService';
 import { supabase } from '../../lib/supabase';
 
@@ -30,6 +31,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
   const [medications, setMedications] = useState<any[]>([]);
   const [recentCalls, setRecentCalls] = useState<any[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
+  const [interests, setInterests] = useState<any[]>([]);
   const [weeklyLogs, setWeeklyLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [initiatingCall, setInitiatingCall] = useState(false);
@@ -50,10 +52,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
       const weekStart = new Date(weekEnd);
       weekStart.setDate(weekEnd.getDate() - 6);
 
-      const [medsData, callsData, eventsData, logsData] = await Promise.all([
+      const [medsData, callsData, eventsData, interestsData, logsData] = await Promise.all([
         getMedications(elderlyProfile.id),
         getCalls(elderlyProfile.id, 10),
         getSpecialEvents(elderlyProfile.id),
+        getInterests(elderlyProfile.id),
         getDailyMedicineLogs(elderlyProfile.id, weekStart, weekEnd),
       ]);
 
@@ -65,6 +68,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
       setMedications(medsData);
       setRecentCalls(callsData.slice(0, 3));
       setUpcomingEvents(upcoming.slice(0, 3));
+      setInterests(interestsData);
       setWeeklyLogs(logsData);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -386,51 +390,95 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
         </div>
       </div>
 
-      {/* 3. Upcoming Events */}
-      {upcomingEvents.length > 0 && (
+      {/* 3. Upcoming Events and Interests */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Upcoming Events */}
+        {upcomingEvents.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-md p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Calendar className="h-5 w-5 text-[#F35E4A] mr-2" />
+                <h3 className="text-lg font-bold text-gray-900">Upcoming Events</h3>
+              </div>
+              <button
+                onClick={() => onNavigate('events')}
+                className="flex items-center text-[#F35E4A] font-semibold hover:underline"
+              >
+                View All
+                <ChevronRight className="h-5 w-5 ml-1" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {upcomingEvents.map((event) => (
+                <div key={event.id} className="flex items-start p-3 bg-gray-50 rounded-lg">
+                  <div className="bg-[#F35E4A] bg-opacity-10 rounded-full p-2 mr-3">
+                    <Calendar className="h-4 w-4 text-[#F35E4A]" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-gray-900 text-sm">{event.event_name}</p>
+                    <p className="text-xs text-gray-600 mt-0.5">
+                      {new Date(event.event_date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })}
+                    </p>
+                    {event.description && (
+                      <p className="text-xs text-gray-500 mt-1">{event.description}</p>
+                    )}
+                    <span className="inline-block mt-1 text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">
+                      {event.event_type.replace('_', ' ')}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* My Interests */}
         <div className="bg-white rounded-2xl shadow-md p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <Calendar className="h-5 w-5 text-[#F35E4A] mr-2" />
-              <h3 className="text-lg font-bold text-gray-900">Upcoming Events</h3>
+              <Heart className="h-5 w-5 text-[#F35E4A] mr-2" />
+              <h3 className="text-lg font-bold text-gray-900">My Interests</h3>
             </div>
             <button
-              onClick={() => onNavigate('events')}
+              onClick={() => onNavigate('interests')}
               className="flex items-center text-[#F35E4A] font-semibold hover:underline"
             >
-              View All
+              Manage
               <ChevronRight className="h-5 w-5 ml-1" />
             </button>
           </div>
 
-          <div className="space-y-3">
-            {upcomingEvents.map((event) => (
-              <div key={event.id} className="flex items-start p-3 bg-gray-50 rounded-lg">
-                <div className="bg-[#F35E4A] bg-opacity-10 rounded-full p-2 mr-3">
-                  <Calendar className="h-4 w-4 text-[#F35E4A]" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-gray-900 text-sm">{event.event_name}</p>
-                  <p className="text-xs text-gray-600 mt-0.5">
-                    {new Date(event.event_date).toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
-                  </p>
-                  {event.description && (
-                    <p className="text-xs text-gray-500 mt-1">{event.description}</p>
-                  )}
-                  <span className="inline-block mt-1 text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">
-                    {event.event_type.replace('_', ' ')}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+          {interests.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {interests.map((interest) => (
+                <span
+                  key={interest.id}
+                  className="inline-flex items-center px-3 py-1.5 bg-[#F35E4A] bg-opacity-10 text-[#F35E4A] rounded-full text-sm font-medium"
+                >
+                  {interest.interest}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Heart className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-600 text-sm mb-3">No interests added yet</p>
+              <button
+                onClick={() => onNavigate('interests')}
+                className="text-[#F35E4A] font-semibold hover:underline text-sm"
+              >
+                Add your interests
+              </button>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
