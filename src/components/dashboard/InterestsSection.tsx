@@ -101,15 +101,9 @@ const InterestsSection: React.FC<InterestsSectionProps> = ({ elderlyProfile }) =
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold text-gray-900">My Interests</h2>
-          <p className="text-gray-600 mt-2">
-            Share your hobbies and interests to help Aasha personalize your conversations
-          </p>
-        </div>
+    <div className="max-w-6xl mx-auto space-y-6">
+      {/* Action Button */}
+      <div className="flex justify-end">
         <button
           onClick={() => setShowAddModal(true)}
           className="flex items-center bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all shadow-md"

@@ -141,33 +141,21 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="bg-white rounded-2xl shadow-md p-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">My Calls</h2>
-        <p className="text-gray-600">Manage your call schedule and review your call history with Aasha</p>
-      </div>
-
-      {/* Call Schedule Section */}
-      <div className="bg-white rounded-2xl shadow-md p-8">
-        <h3 className="text-2xl font-bold text-gray-900 mb-6">Call Schedule Preferences</h3>
-
-        {/* Current Schedule */}
-        <div className="bg-gradient-to-r from-[#F35E4A] to-[#e54d37] rounded-xl shadow-lg p-6 text-white mb-6">
-          <div className="flex items-center mb-2">
-            <Clock className="h-6 w-6 mr-2" />
-            <h4 className="text-lg font-bold">Current Preference</h4>
+    <div className="max-w-6xl mx-auto space-y-6">
+      {/* Call Schedule Section - Compact */}
+      <div className="bg-white rounded-xl shadow-sm p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Clock className="h-5 w-5 text-[#F35E4A]" />
+            <h3 className="text-base font-bold text-gray-900">Call Preference:</h3>
+            <span className="text-sm text-gray-600">
+              {timeOptions.find((opt) => opt.id === elderlyProfile.call_time_preference)?.label || 'Not set'}
+            </span>
           </div>
-          <p className="text-xl opacity-90">
-            {timeOptions.find((opt) => opt.id === elderlyProfile.call_time_preference)?.label || 'Not set'}
-          </p>
-          <p className="text-base opacity-75 mt-1">
-            {timeOptions.find((opt) => opt.id === elderlyProfile.call_time_preference)?.time || ''}
-          </p>
         </div>
 
-        {/* Time Options */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {/* Time Options - Compact Pills */}
+        <div className="flex flex-wrap gap-3">
           {timeOptions.map((option) => {
             const Icon = option.icon;
             const isSelected = selectedTime === option.id;
@@ -175,67 +163,42 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
               <button
                 key={option.id}
                 onClick={() => setSelectedTime(option.id)}
-                className={`relative bg-white rounded-xl shadow-sm p-4 text-left transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   isSelected
-                    ? 'ring-2 ring-[#F35E4A] border-2 border-[#F35E4A]'
-                    : 'border-2 border-gray-200 hover:border-[#F35E4A]'
+                    ? 'bg-[#F35E4A] text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                {isSelected && (
-                  <div className="absolute top-3 right-3 bg-[#F35E4A] rounded-full p-1">
-                    <svg
-                      className="h-3 w-3 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                )}
-                <div className={`bg-gradient-to-r ${option.gradient} rounded-lg p-3 mb-3 inline-block`}>
-                  <Icon className="h-6 w-6 text-white" />
-                </div>
-                <h5 className="text-lg font-bold text-gray-900 mb-1">{option.label}</h5>
-                <p className="text-sm text-[#F35E4A] font-semibold">{option.time}</p>
+                <Icon className="h-4 w-4" />
+                <span>{option.label}</span>
+                <span className="text-xs opacity-75">({option.time})</span>
               </button>
             );
           })}
-        </div>
-
-        {/* Save Button */}
-        {hasScheduleChanges && (
-          <div className="bg-gray-50 rounded-xl p-4 flex items-center justify-between">
-            <div>
-              <p className="font-semibold text-gray-900 text-sm">You have unsaved changes</p>
-              <p className="text-xs text-gray-600">Click save to update your call schedule</p>
-            </div>
+          {hasScheduleChanges && (
             <button
               onClick={handleSaveSchedule}
               disabled={savingSchedule}
-              className="flex items-center bg-[#F35E4A] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#e54d37] transition-all disabled:opacity-50 text-sm"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-all disabled:opacity-50"
             >
               {savingSchedule ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
                   Saving...
                 </>
               ) : (
                 <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Changes
+                  <Save className="h-3 w-3" />
+                  Save
                 </>
               )}
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-xl shadow-md p-4">
+      <div className="bg-white rounded-xl shadow-sm p-4">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
@@ -250,7 +213,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
 
       {/* Calls List */}
       {filteredCalls.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filteredCalls.map((call) => {
             const analysis = call.call_analysis?.[0];
             const summary = analysis?.call_summary || call.call_transcripts?.[0]?.llm_call_summary || 'No summary available';
@@ -290,7 +253,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
           })}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-md p-12 text-center">
+        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <MessageCircle className="h-24 w-24 text-gray-300 mx-auto mb-4" />
           <h3 className="text-2xl font-bold text-gray-900 mb-2">
             {searchQuery ? 'No Calls Found' : 'No Calls Yet'}
