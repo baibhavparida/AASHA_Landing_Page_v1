@@ -3,14 +3,16 @@ import {
   Pill,
   Calendar,
   MessageCircle,
-  TrendingUp,
   Clock,
   CheckCircle,
-  AlertCircle,
   Phone,
-  Loader2
+  Loader2,
+  Check,
+  X as XIcon,
+  ChevronRight
 } from 'lucide-react';
-import { getMedications, getCalls, getSpecialEvents, getMedicationTracking } from '../../services/dashboardService';
+import { getMedications, getCalls, getSpecialEvents } from '../../services/dashboardService';
+import { getDailyMedicineLogs } from '../../services/dailyMedicineLogService';
 import { supabase } from '../../lib/supabase';
 
 interface DashboardHomeProps {
@@ -24,14 +26,10 @@ interface DashboardHomeProps {
 }
 
 const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigate }) => {
-  const [stats, setStats] = useState({
-    medicationCount: 0,
-    upcomingEvents: 0,
-    recentConversations: 0,
-    medicationAdherence: 0,
-  });
-  const [todayMedications, setTodayMedications] = useState<any[]>([]);
+  const [medications, setMedications] = useState<any[]>([]);
+  const [recentCalls, setRecentCalls] = useState<any[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
+  const [weeklyLogs, setWeeklyLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [initiatingCall, setInitiatingCall] = useState(false);
   const [callError, setCallError] = useState<string | null>(null);
@@ -44,29 +42,26 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const [medications, calls, events] = await Promise.all([
+      const today = new Date();
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - 6);
+
+      const [medsData, callsData, eventsData, logsData] = await Promise.all([
         getMedications(elderlyProfile.id),
-        getCalls(elderlyProfile.id, 5),
+        getCalls(elderlyProfile.id, 10),
         getSpecialEvents(elderlyProfile.id),
+        getDailyMedicineLogs(elderlyProfile.id, weekStart, today),
       ]);
 
-      const today = new Date();
-      const nextWeek = new Date();
-      nextWeek.setDate(today.getDate() + 7);
-
-      const upcoming = events.filter(event => {
+      const upcoming = eventsData.filter(event => {
         const eventDate = new Date(event.event_date);
-        return eventDate >= today && eventDate <= nextWeek;
-      });
+        return eventDate >= today;
+      }).sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
 
-      setTodayMedications(medications.slice(0, 3));
+      setMedications(medsData);
+      setRecentCalls(callsData.slice(0, 5));
       setUpcomingEvents(upcoming.slice(0, 3));
-      setStats({
-        medicationCount: medications.length,
-        upcomingEvents: upcoming.length,
-        recentConversations: calls.length,
-        medicationAdherence: 85,
-      });
+      setWeeklyLogs(logsData);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -147,11 +142,27 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
     );
   }
 
+  const getAdherenceRate = () => {
+    if (weeklyLogs.length === 0) return 0;
+    const takenDays = weeklyLogs.filter(log => log.medicine_taken).length;
+    return Math.round((takenDays / weeklyLogs.length) * 100);
+  };
+
+  const getLast7Days = () => {
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      days.push(date);
+    }
+    return days;
+  };
+
   return (
     <div className="space-y-8">
       {/* Welcome Section */}
       <div className="bg-white rounded-2xl shadow-md p-8">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
               {getGreeting()}, {elderlyProfile.first_name}!
@@ -163,7 +174,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
           <button
             onClick={handleTalkToAasha}
             disabled={initiatingCall}
-            className="flex items-center space-x-2 bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="flex items-center justify-center space-x-2 bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
           >
             {initiatingCall ? (
               <>
@@ -190,160 +201,227 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
         )}
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-[#F35E4A]">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Total Medications</p>
-              <p className="text-3xl font-bold text-gray-900">{stats.medicationCount}</p>
-            </div>
-            <Pill className="h-12 w-12 text-[#F35E4A] opacity-20" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Adherence Rate</p>
-              <p className="text-3xl font-bold text-gray-900">{stats.medicationAdherence}%</p>
-            </div>
-            <TrendingUp className="h-12 w-12 text-green-500 opacity-20" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Upcoming Events</p>
-              <p className="text-3xl font-bold text-gray-900">{stats.upcomingEvents}</p>
-            </div>
-            <Calendar className="h-12 w-12 text-blue-500 opacity-20" />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Recent Chats</p>
-              <p className="text-3xl font-bold text-gray-900">{stats.recentConversations}</p>
-            </div>
-            <MessageCircle className="h-12 w-12 text-purple-500 opacity-20" />
-          </div>
-        </div>
-      </div>
-
-      {/* Next Call Schedule */}
+      {/* 1. Medication Tracking - Primary Focus */}
       <div className="bg-white rounded-2xl shadow-md p-8">
-        <div className="flex items-center mb-4">
-          <Clock className="h-6 w-6 text-[#F35E4A] mr-3" />
-          <h3 className="text-xl font-bold text-gray-900">Your Next Aasha Call</h3>
-        </div>
-        <p className="text-base text-gray-700 mb-2">Preferred Time: {getCallTimeDisplay()}</p>
-        <p className="text-sm text-gray-600">Aasha will call you during your preferred time window</p>
-      </div>
-
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Today's Medications */}
-        <div className="bg-white rounded-2xl shadow-md p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900">Today's Medications</h3>
-            <button
-              onClick={() => onNavigate('medications')}
-              className="text-[#F35E4A] font-semibold hover:underline"
-            >
-              View All
-            </button>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center">
+            <Pill className="h-6 w-6 text-[#F35E4A] mr-3" />
+            <h3 className="text-2xl font-bold text-gray-900">Medication Tracking</h3>
           </div>
-          {todayMedications.length > 0 ? (
-            <div className="space-y-4">
-              {todayMedications.map((med) => (
-                <div key={med.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <button
+            onClick={() => onNavigate('medications')}
+            className="flex items-center text-[#F35E4A] font-semibold hover:underline"
+          >
+            View Details
+            <ChevronRight className="h-5 w-5 ml-1" />
+          </button>
+        </div>
+
+        {/* Weekly Adherence */}
+        <div className="grid grid-cols-7 gap-3 mb-6">
+          {getLast7Days().map((day, idx) => {
+            const dayStr = day.toISOString().split('T')[0];
+            const log = weeklyLogs.find(l => l.log_date === dayStr);
+            const isToday = day.toDateString() === new Date().toDateString();
+
+            return (
+              <div
+                key={idx}
+                className={`bg-gray-50 rounded-xl p-3 text-center border-2 transition-all ${
+                  isToday ? 'border-[#F35E4A] bg-[#F35E4A] bg-opacity-5' : 'border-gray-100'
+                }`}
+              >
+                <div className={`text-xs font-semibold mb-1 ${
+                  isToday ? 'text-[#F35E4A]' : 'text-gray-600'
+                }`}>
+                  {day.toLocaleDateString('en-US', { weekday: 'short' })}
+                </div>
+                <div className={`text-sm font-bold mb-2 ${
+                  isToday ? 'text-[#F35E4A]' : 'text-gray-900'
+                }`}>
+                  {day.getDate()}
+                </div>
+                <div className="flex items-center justify-center">
+                  {log ? (
+                    log.medicine_taken ? (
+                      <div className="bg-green-100 rounded-full p-1.5">
+                        <Check className="h-4 w-4 text-green-600" />
+                      </div>
+                    ) : (
+                      <div className="bg-red-100 rounded-full p-1.5">
+                        <XIcon className="h-4 w-4 text-red-600" />
+                      </div>
+                    )
+                  ) : (
+                    <div className="w-7 h-7 bg-gray-200 rounded-full"></div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Stats Row */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-sm text-gray-600 mb-1">Adherence Rate</p>
+            <p className="text-2xl font-bold text-gray-900">{getAdherenceRate()}%</p>
+          </div>
+          <div className="bg-gray-50 rounded-xl p-4">
+            <p className="text-sm text-gray-600 mb-1">Total Medications</p>
+            <p className="text-2xl font-bold text-gray-900">{medications.length}</p>
+          </div>
+          <div className="bg-gray-50 rounded-xl p-4 col-span-2 md:col-span-1">
+            <p className="text-sm text-gray-600 mb-1">Next Call</p>
+            <p className="text-lg font-bold text-gray-900">{getCallTimeDisplay()}</p>
+          </div>
+        </div>
+
+        {/* Medications List Preview */}
+        {medications.length > 0 && (
+          <div className="mt-6">
+            <h4 className="font-semibold text-gray-900 mb-3">Your Medications</h4>
+            <div className="space-y-2">
+              {medications.slice(0, 3).map((med) => (
+                <div key={med.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center">
-                    <Pill className="h-8 w-8 text-[#F35E4A] mr-3" />
+                    <div className="bg-[#F35E4A] bg-opacity-10 rounded-lg p-2 mr-3">
+                      <Pill className="h-4 w-4 text-[#F35E4A]" />
+                    </div>
                     <div>
-                      <p className="font-semibold text-gray-900">{med.name}</p>
-                      <p className="text-sm text-gray-600">{med.dosage} - {med.time}</p>
+                      <p className="font-medium text-gray-900">{med.name}</p>
+                      <p className="text-sm text-gray-600">{med.dosage_quantity}x - {med.times_of_day?.join(', ')}</p>
                     </div>
                   </div>
-                  <CheckCircle className="h-6 w-6 text-gray-400" />
                 </div>
               ))}
+              {medications.length > 3 && (
+                <button
+                  onClick={() => onNavigate('medications')}
+                  className="text-[#F35E4A] text-sm font-semibold hover:underline w-full text-center pt-2"
+                >
+                  View {medications.length - 3} more medications
+                </button>
+              )}
             </div>
-          ) : (
-            <div className="text-center py-8">
-              <Pill className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600">No medications scheduled</p>
-              <button
-                onClick={() => onNavigate('medications')}
-                className="mt-4 text-[#F35E4A] font-semibold hover:underline"
-              >
-                Add Medication
-              </button>
-            </div>
-          )}
+          </div>
+        )}
+      </div>
+
+      {/* 2. Call Conversations Tracking */}
+      <div className="bg-white rounded-2xl shadow-md p-8">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center">
+            <MessageCircle className="h-6 w-6 text-[#F35E4A] mr-3" />
+            <h3 className="text-2xl font-bold text-gray-900">Recent Conversations</h3>
+          </div>
+          <button
+            onClick={() => onNavigate('conversations')}
+            className="flex items-center text-[#F35E4A] font-semibold hover:underline"
+          >
+            View All
+            <ChevronRight className="h-5 w-5 ml-1" />
+          </button>
         </div>
 
-        {/* Upcoming Events */}
-        <div className="bg-white rounded-2xl shadow-md p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-900">Upcoming Events</h3>
+        {recentCalls.length > 0 ? (
+          <div className="space-y-4">
+            {recentCalls.map((call) => (
+              <div key={call.id} className="flex items-start p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all">
+                <div className="bg-[#F35E4A] bg-opacity-10 rounded-full p-3 mr-4">
+                  <Phone className="h-5 w-5 text-[#F35E4A]" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="font-semibold text-gray-900">
+                      {call.call_type === 'daily_checkin' ? 'Daily Check-in' : 'Onboarding Call'}
+                    </p>
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      call.call_status === 'successful'
+                        ? 'bg-green-100 text-green-700'
+                        : call.call_status === 'voicemail'
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}>
+                      {call.call_status}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    {new Date(call.started_at).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                    })}
+                  </p>
+                  {call.duration_seconds && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Duration: {Math.floor(call.duration_seconds / 60)}m {call.duration_seconds % 60}s
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <MessageCircle className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-600">No conversations yet</p>
             <button
-              onClick={() => onNavigate('events')}
-              className="text-[#F35E4A] font-semibold hover:underline"
+              onClick={handleTalkToAasha}
+              className="mt-4 bg-[#F35E4A] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#e54d37] transition-all"
             >
-              View All
+              Start Your First Chat
             </button>
           </div>
-          {upcomingEvents.length > 0 ? (
-            <div className="space-y-4">
-              {upcomingEvents.map((event) => (
-                <div key={event.id} className="flex items-start p-4 bg-gray-50 rounded-lg">
-                  <Calendar className="h-8 w-8 text-[#F35E4A] mr-3 flex-shrink-0" />
-                  <div>
-                    <p className="font-semibold text-gray-900">{event.event_name}</p>
-                    <p className="text-sm text-gray-600">
-                      {new Date(event.event_date).toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
-                    </p>
-                    {event.description && (
-                      <p className="text-sm text-gray-500 mt-1">{event.description}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600">No upcoming events</p>
-              <button
-                onClick={() => onNavigate('events')}
-                className="mt-4 text-[#F35E4A] font-semibold hover:underline"
-              >
-                Add Event
-              </button>
-            </div>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* Daily Tip */}
-      <div className="bg-blue-50 border-l-4 border-blue-500 rounded-xl p-6">
-        <div className="flex items-start">
-          <AlertCircle className="h-6 w-6 text-blue-500 mr-3 flex-shrink-0 mt-1" />
-          <div>
-            <h4 className="font-semibold text-blue-900 mb-1">Daily Wellness Tip</h4>
-            <p className="text-blue-800">
-              Remember to stay hydrated throughout the day. Aim for 6-8 glasses of water to keep your body healthy and energized!
-            </p>
+      {/* 3. Upcoming Events */}
+      {upcomingEvents.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-md p-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center">
+              <Calendar className="h-6 w-6 text-[#F35E4A] mr-3" />
+              <h3 className="text-2xl font-bold text-gray-900">Upcoming Events</h3>
+            </div>
+            <button
+              onClick={() => onNavigate('events')}
+              className="flex items-center text-[#F35E4A] font-semibold hover:underline"
+            >
+              View All
+              <ChevronRight className="h-5 w-5 ml-1" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {upcomingEvents.map((event) => (
+              <div key={event.id} className="flex items-start p-4 bg-gray-50 rounded-lg">
+                <div className="bg-[#F35E4A] bg-opacity-10 rounded-full p-3 mr-4">
+                  <Calendar className="h-5 w-5 text-[#F35E4A]" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-gray-900">{event.event_name}</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {new Date(event.event_date).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </p>
+                  {event.description && (
+                    <p className="text-sm text-gray-500 mt-2">{event.description}</p>
+                  )}
+                  <span className="inline-block mt-2 text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                    {event.event_type.replace('_', ' ')}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
