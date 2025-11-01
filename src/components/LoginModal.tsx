@@ -101,7 +101,30 @@ export default function LoginModal({ onClose, onLoginSuccess }: LoginModalProps)
       // Accept any OTP - bypass authentication for now
       // In production, you would verify the OTP here
 
-      // Store profile ID in localStorage for dashboard to use
+      // CRITICAL FIX: Actually sign in to Supabase to get an authenticated session
+      const email = `${phoneNumber}@aasha-temp.com`;
+
+      // Generate the same password used during registration
+      const hash = phoneNumber.split('').reduce((acc: number, char: string) => {
+        return ((acc << 5) - acc) + char.charCodeAt(0);
+      }, 0);
+      const password = `aasha_${Math.abs(hash)}_${phoneNumber.slice(-4)}_temp_pw_2025`;
+
+      const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        console.error('Sign in error:', signInError);
+        throw new Error('Login failed. Please check your credentials and try again.');
+      }
+
+      if (!authData.session) {
+        throw new Error('Failed to create session. Please try again.');
+      }
+
+      // Store profile ID in localStorage for additional reference
       localStorage.setItem('aasha_profile_id', profileData.id);
       localStorage.setItem('aasha_phone_number', phoneNumber);
       localStorage.setItem('aasha_country_code', countryCode);
