@@ -30,6 +30,7 @@ export async function getElderlyProfileForUser() {
 
   if (profileError) {
     console.error('Error checking profile in profiles table:', profileError);
+    console.error('Full error details:', JSON.stringify(profileError, null, 2));
     throw new Error('Failed to verify user profile. Please try logging in again.');
   }
 
@@ -49,11 +50,14 @@ export async function getElderlyProfileForUser() {
 
   if (error) {
     console.error('Error fetching elderly profile:', error);
+    console.error('Full error details:', JSON.stringify(error, null, 2));
+    console.error('Query details: profile_id =', profileId);
     throw new Error('Failed to load profile data. Please try again.');
   }
 
   if (!data) {
     console.error('No elderly profile found for profile_id:', profileId);
+    console.error('This means the query succeeded but returned no rows');
     throw new Error('Your profile setup is incomplete. Please complete the registration process.');
   }
 
