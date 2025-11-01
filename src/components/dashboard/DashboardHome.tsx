@@ -11,7 +11,27 @@ import {
   X as XIcon,
   ChevronRight,
   ChevronLeft,
-  Heart
+  Heart,
+  Book,
+  Music,
+  Palette,
+  Trophy,
+  Tv,
+  Coffee,
+  Camera,
+  Utensils,
+  Plane,
+  Flower2,
+  Dog,
+  Bird,
+  TreePine,
+  Dumbbell,
+  Gamepad2,
+  ShoppingBag,
+  Film,
+  GraduationCap,
+  Theater,
+  Sparkles
 } from 'lucide-react';
 import { getMedications, getCalls, getSpecialEvents, getInterests } from '../../services/dashboardService';
 import { getDailyMedicineLogs } from '../../services/dailyMedicineLogService';
@@ -332,48 +352,39 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
 
         {recentCalls.length > 0 ? (
           <div className="space-y-3">
-            {recentCalls.map((call) => (
-              <div key={call.id} className="flex items-start p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all">
-                <div className="bg-[#F35E4A] bg-opacity-10 rounded-full p-2 mr-3">
-                  <Phone className="h-4 w-4 text-[#F35E4A]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <p className="font-semibold text-gray-900 text-sm truncate">
-                      {call.llm_call_summary ||
-                       (call.call_type === 'daily_checkin' ? 'Daily Check-in' :
-                        call.call_type === 'phone_call' ? 'Call Summary' :
-                        call.call_type === 'onboarding' ? 'Onboarding Call' :
-                        'Call')}
+            {recentCalls.map((call) => {
+              const summary = call.call_analysis?.[0]?.call_summary || call.call_transcripts?.[0]?.llm_call_summary || 'No summary available';
+              const formatDuration = (seconds: number) => {
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${minutes}:${secs.toString().padStart(2, '0')}`;
+              };
+              return (
+                <div key={call.id} className="flex items-start p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all cursor-pointer">
+                  <div className="bg-[#F35E4A] bg-opacity-10 rounded-lg p-2 mr-3">
+                    <Phone className="h-5 w-5 text-[#F35E4A]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 text-sm mb-1 line-clamp-1">
+                      {summary}
                     </p>
-                    {call.call_status && call.call_status !== '' && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ml-2 ${
-                        call.call_status === 'successful' || call.call_status === 'registered'
-                          ? 'bg-green-100 text-green-700'
-                          : call.call_status === 'voicemail'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : 'bg-red-100 text-red-700'
-                      }`}>
-                        {call.call_status}
-                      </span>
+                    <p className="text-xs text-gray-600">
+                      {call.created_at ? new Date(call.created_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      }) : 'Date not available'}
+                    </p>
+                    {call.duration_seconds !== undefined && call.duration_seconds !== null && (
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        Duration: {formatDuration(call.duration_seconds)}
+                      </p>
                     )}
                   </div>
-                  <p className="text-xs text-gray-600">
-                    {call.created_at ? new Date(call.created_at).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit',
-                    }) : 'Date not available'}
-                  </p>
-                  {call.duration_seconds !== undefined && call.duration_seconds !== null && (
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      Duration: {Math.floor(call.duration_seconds / 60)}m {call.duration_seconds % 60}s
-                    </p>
-                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-8">
@@ -456,14 +467,40 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
 
           {interests.length > 0 ? (
             <div className="flex flex-wrap gap-2">
-              {interests.map((interest) => (
-                <span
-                  key={interest.id}
-                  className="inline-flex items-center px-3 py-1.5 bg-[#F35E4A] bg-opacity-10 text-[#F35E4A] rounded-full text-sm font-medium"
-                >
-                  {interest.interest}
-                </span>
-              ))}
+              {interests.map((interest) => {
+                const getInterestIcon = (interestName: string) => {
+                  const name = interestName.toLowerCase();
+                  if (name.includes('read')) return <Book className="h-3.5 w-3.5" />;
+                  if (name.includes('music')) return <Music className="h-3.5 w-3.5" />;
+                  if (name.includes('art') || name.includes('craft') || name.includes('paint') || name.includes('draw')) return <Palette className="h-3.5 w-3.5" />;
+                  if (name.includes('sport') || name.includes('game')) return <Trophy className="h-3.5 w-3.5" />;
+                  if (name.includes('tv') || name.includes('show') || name.includes('watch')) return <Tv className="h-3.5 w-3.5" />;
+                  if (name.includes('cook') || name.includes('bak') || name.includes('food')) return <Utensils className="h-3.5 w-3.5" />;
+                  if (name.includes('photo')) return <Camera className="h-3.5 w-3.5" />;
+                  if (name.includes('travel')) return <Plane className="h-3.5 w-3.5" />;
+                  if (name.includes('garden') || name.includes('plant')) return <Flower2 className="h-3.5 w-3.5" />;
+                  if (name.includes('dog')) return <Dog className="h-3.5 w-3.5" />;
+                  if (name.includes('bird')) return <Bird className="h-3.5 w-3.5" />;
+                  if (name.includes('nature') || name.includes('outdoor')) return <TreePine className="h-3.5 w-3.5" />;
+                  if (name.includes('exercise') || name.includes('fitness') || name.includes('gym')) return <Dumbbell className="h-3.5 w-3.5" />;
+                  if (name.includes('video game') || name.includes('gaming')) return <Gamepad2 className="h-3.5 w-3.5" />;
+                  if (name.includes('shop')) return <ShoppingBag className="h-3.5 w-3.5" />;
+                  if (name.includes('movie') || name.includes('film')) return <Film className="h-3.5 w-3.5" />;
+                  if (name.includes('learn') || name.includes('study') || name.includes('educat')) return <GraduationCap className="h-3.5 w-3.5" />;
+                  if (name.includes('theater') || name.includes('drama')) return <Theater className="h-3.5 w-3.5" />;
+                  if (name.includes('coffee') || name.includes('tea')) return <Coffee className="h-3.5 w-3.5" />;
+                  return <Sparkles className="h-3.5 w-3.5" />;
+                };
+                return (
+                  <span
+                    key={interest.id}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F35E4A] bg-opacity-10 text-[#F35E4A] rounded-full text-sm font-medium"
+                  >
+                    {getInterestIcon(interest.interest)}
+                    {interest.interest}
+                  </span>
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-8">
