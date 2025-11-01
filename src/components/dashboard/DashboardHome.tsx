@@ -9,7 +9,8 @@ import {
   Loader2,
   Check,
   X as XIcon,
-  ChevronRight
+  ChevronRight,
+  ChevronLeft
 } from 'lucide-react';
 import { getMedications, getCalls, getSpecialEvents } from '../../services/dashboardService';
 import { getDailyMedicineLogs } from '../../services/dailyMedicineLogService';
@@ -34,23 +35,26 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
   const [initiatingCall, setInitiatingCall] = useState(false);
   const [callError, setCallError] = useState<string | null>(null);
   const [callSuccess, setCallSuccess] = useState(false);
+  const [selectedWeekOffset, setSelectedWeekOffset] = useState(0);
 
   useEffect(() => {
     loadDashboardData();
-  }, [elderlyProfile.id]);
+  }, [elderlyProfile.id, selectedWeekOffset]);
 
   const loadDashboardData = async () => {
     try {
       setLoading(true);
       const today = new Date();
-      const weekStart = new Date(today);
-      weekStart.setDate(today.getDate() - 6);
+      const weekEnd = new Date(today);
+      weekEnd.setDate(today.getDate() - (selectedWeekOffset * 7));
+      const weekStart = new Date(weekEnd);
+      weekStart.setDate(weekEnd.getDate() - 6);
 
       const [medsData, callsData, eventsData, logsData] = await Promise.all([
         getMedications(elderlyProfile.id),
         getCalls(elderlyProfile.id, 10),
         getSpecialEvents(elderlyProfile.id),
-        getDailyMedicineLogs(elderlyProfile.id, weekStart, today),
+        getDailyMedicineLogs(elderlyProfile.id, weekStart, weekEnd),
       ]);
 
       const upcoming = eventsData.filter(event => {
@@ -150,12 +154,19 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
 
   const getLast7Days = () => {
     const days = [];
+    const today = new Date();
     for (let i = 6; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
+      const date = new Date(today);
+      date.setDate(today.getDate() - i - (selectedWeekOffset * 7));
       days.push(date);
     }
     return days;
+  };
+
+  const getWeekLabel = () => {
+    if (selectedWeekOffset === 0) return 'This Week';
+    if (selectedWeekOffset === 1) return 'Last Week';
+    return `${selectedWeekOffset} Weeks Ago`;
   };
 
   return (
@@ -169,6 +180,9 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
             </h2>
             <p className="text-lg text-gray-600">
               Here's your daily overview. Have a wonderful day!
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Preferred call window: {getCallTimeDisplay()}
             </p>
           </div>
           <button
@@ -219,6 +233,26 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
           </button>
         </div>
 
+        {/* Week Selector */}
+        <div className="flex items-center justify-between mb-3">
+          <button
+            onClick={() => setSelectedWeekOffset(selectedWeekOffset + 1)}
+            className="flex items-center text-gray-600 hover:text-[#F35E4A] transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span className="text-sm">Previous</span>
+          </button>
+          <span className="text-sm font-semibold text-gray-700">{getWeekLabel()}</span>
+          <button
+            onClick={() => setSelectedWeekOffset(Math.max(0, selectedWeekOffset - 1))}
+            disabled={selectedWeekOffset === 0}
+            className="flex items-center text-gray-600 hover:text-[#F35E4A] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <span className="text-sm">Next</span>
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
+
         {/* Weekly Adherence */}
         <div className="grid grid-cols-7 gap-2 mb-4">
           {getLast7Days().map((day, idx) => {
@@ -263,8 +297,8 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
           })}
         </div>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* Stats Row - Vertical Stack */}
+        <div className="space-y-3">
           <div className="bg-gray-50 rounded-lg p-3">
             <p className="text-sm text-gray-600 mb-1">Adherence Rate</p>
             <p className="text-2xl font-bold text-gray-900">{getAdherenceRate()}%</p>
@@ -354,11 +388,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
 
       {/* 3. Upcoming Events */}
       {upcomingEvents.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-md p-8">
-          <div className="flex items-center justify-between mb-6">
+        <div className="bg-white rounded-2xl shadow-md p-5">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <Calendar className="h-6 w-6 text-[#F35E4A] mr-3" />
-              <h3 className="text-2xl font-bold text-gray-900">Upcoming Events</h3>
+              <Calendar className="h-5 w-5 text-[#F35E4A] mr-2" />
+              <h3 className="text-lg font-bold text-gray-900">Upcoming Events</h3>
             </div>
             <button
               onClick={() => onNavigate('events')}
@@ -369,15 +403,15 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
             </button>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {upcomingEvents.map((event) => (
-              <div key={event.id} className="flex items-start p-4 bg-gray-50 rounded-lg">
-                <div className="bg-[#F35E4A] bg-opacity-10 rounded-full p-3 mr-4">
-                  <Calendar className="h-5 w-5 text-[#F35E4A]" />
+              <div key={event.id} className="flex items-start p-3 bg-gray-50 rounded-lg">
+                <div className="bg-[#F35E4A] bg-opacity-10 rounded-full p-2 mr-3">
+                  <Calendar className="h-4 w-4 text-[#F35E4A]" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-gray-900">{event.event_name}</p>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="font-semibold text-gray-900 text-sm">{event.event_name}</p>
+                  <p className="text-xs text-gray-600 mt-0.5">
                     {new Date(event.event_date).toLocaleDateString('en-US', {
                       weekday: 'long',
                       month: 'long',
@@ -386,9 +420,9 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
                     })}
                   </p>
                   {event.description && (
-                    <p className="text-sm text-gray-500 mt-2">{event.description}</p>
+                    <p className="text-xs text-gray-500 mt-1">{event.description}</p>
                   )}
-                  <span className="inline-block mt-2 text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                  <span className="inline-block mt-1 text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">
                     {event.event_type.replace('_', ' ')}
                   </span>
                 </div>
