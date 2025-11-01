@@ -262,7 +262,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <div className="bg-gray-50 rounded-xl p-4">
             <p className="text-sm text-gray-600 mb-1">Adherence Rate</p>
             <p className="text-2xl font-bold text-gray-900">{getAdherenceRate()}%</p>
@@ -271,41 +271,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
             <p className="text-sm text-gray-600 mb-1">Total Medications</p>
             <p className="text-2xl font-bold text-gray-900">{medications.length}</p>
           </div>
-          <div className="bg-gray-50 rounded-xl p-4 col-span-2 md:col-span-1">
-            <p className="text-sm text-gray-600 mb-1">Next Call</p>
-            <p className="text-lg font-bold text-gray-900">{getCallTimeDisplay()}</p>
-          </div>
         </div>
-
-        {/* Medications List Preview */}
-        {medications.length > 0 && (
-          <div className="mt-6">
-            <h4 className="font-semibold text-gray-900 mb-3">Your Medications</h4>
-            <div className="space-y-2">
-              {medications.slice(0, 3).map((med) => (
-                <div key={med.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center">
-                    <div className="bg-[#F35E4A] bg-opacity-10 rounded-lg p-2 mr-3">
-                      <Pill className="h-4 w-4 text-[#F35E4A]" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{med.name}</p>
-                      <p className="text-sm text-gray-600">{med.dosage_quantity}x - {med.times_of_day?.join(', ')}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {medications.length > 3 && (
-                <button
-                  onClick={() => onNavigate('medications')}
-                  className="text-[#F35E4A] text-sm font-semibold hover:underline w-full text-center pt-2"
-                >
-                  View {medications.length - 3} more medications
-                </button>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* 2. Call Conversations Tracking */}
