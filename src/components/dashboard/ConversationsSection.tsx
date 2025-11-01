@@ -79,8 +79,8 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
       <div className="bg-white rounded-2xl shadow-md p-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">My Conversations</h2>
-        <p className="text-gray-600">Review your past conversations with Aasha</p>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">My Calls</h2>
+        <p className="text-gray-600">Review your call history with Aasha</p>
       </div>
 
       {/* Search */}
@@ -91,7 +91,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search conversations by date or topic..."
+            placeholder="Search calls by date or topic..."
             className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-[#F35E4A] focus:outline-none text-lg"
           />
         </div>
@@ -186,32 +186,26 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
             <div className="flex-1 overflow-y-auto p-6">
               <div className="space-y-6">
                 {/* Summary */}
-                <div>
-                  <h4 className="text-lg font-bold text-gray-900 mb-3">Call Summary</h4>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-gray-700 leading-relaxed">
-                      {selectedCall.call_analysis?.[0]?.call_summary || selectedCall.call_transcripts?.[0]?.llm_call_summary || 'No summary available'}
-                    </p>
+                {(selectedCall.call_analysis?.[0]?.call_summary || selectedCall.call_transcripts?.[0]?.llm_call_summary) && (
+                  <div>
+                    <h4 className="text-lg font-bold text-gray-900 mb-3">Call Summary</h4>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <p className="text-gray-700 leading-relaxed">
+                        {selectedCall.call_analysis?.[0]?.call_summary || selectedCall.call_transcripts?.[0]?.llm_call_summary}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                {/* Transcript Section */}
+                {/* Full Transcript */}
                 {selectedCall.call_transcripts?.[0]?.transcript_text && (
                   <div>
-                    <button
-                      onClick={() => setShowTranscript(!showTranscript)}
-                      className="flex items-center text-[#F35E4A] font-semibold hover:underline mb-3"
-                    >
-                      <FileText className="h-5 w-5 mr-2" />
-                      {showTranscript ? 'Hide' : 'View'} Full Transcript
-                    </button>
-                    {showTranscript && (
-                      <div className="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
-                        <pre className="text-gray-700 whitespace-pre-wrap leading-relaxed font-sans">
-                          {selectedCall.call_transcripts?.[0]?.transcript_text}
-                        </pre>
-                      </div>
-                    )}
+                    <h4 className="text-lg font-bold text-gray-900 mb-3">Full Transcript</h4>
+                    <div className="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
+                      <pre className="text-gray-700 whitespace-pre-wrap leading-relaxed font-sans">
+                        {selectedCall.call_transcripts?.[0]?.transcript_text}
+                      </pre>
+                    </div>
                   </div>
                 )}
               </div>
