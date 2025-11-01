@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Pill, Plus, Edit2, Trash2, X } from 'lucide-react';
+import { Pill, Plus, Edit2, Trash2, X, Calendar, Check, X as XIcon, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   getMedications,
   addMedication,
   updateMedication,
   deleteMedication,
 } from '../../services/dashboardService';
+import { getMedicationTracking, updateMedicationStatus } from '../../services/medicationTrackingService';
 
 interface MedicationsSectionProps {
   elderlyProfile: {
@@ -19,6 +20,9 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({ elderlyProfile 
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedMed, setSelectedMed] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showTracking, setShowTracking] = useState(true);
+  const [trackingData, setTrackingData] = useState<any[]>([]);
+  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(getWeekStart(new Date()));
   const [formData, setFormData] = useState({
     name: '',
     dosage_quantity: 1,
@@ -27,7 +31,36 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({ elderlyProfile 
 
   useEffect(() => {
     loadMedications();
-  }, [elderlyProfile.id]);
+    loadTrackingData();
+  }, [elderlyProfile.id, currentWeekStart]);
+
+  function getWeekStart(date: Date) {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day;
+    return new Date(d.setDate(diff));
+  }
+
+  function getWeekDays(startDate: Date) {
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startDate);
+      day.setDate(startDate.getDate() + i);
+      days.push(day);
+    }
+    return days;
+  }
+
+  const loadTrackingData = async () => {
+    try {
+      const weekEnd = new Date(currentWeekStart);
+      weekEnd.setDate(weekEnd.getDate() + 7);
+      const data = await getMedicationTracking(elderlyProfile.id, currentWeekStart, weekEnd);
+      setTrackingData(data);
+    } catch (error) {
+      console.error('Error loading tracking data:', error);
+    }
+  };
 
   const loadMedications = async () => {
     try {
@@ -158,8 +191,170 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({ elderlyProfile 
         </button>
       </div>
 
+      {/* Tracking Toggle */}
+      {medications.length > 0 && (
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <button
+            onClick={() => setShowTracking(false)}
+            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+              !showTracking
+                ? 'bg-[#F35E4A] text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Medications List
+          </button>
+          <button
+            onClick={() => setShowTracking(true)}
+            className={`px-6 py-3 rounded-lg font-semibold transition-all flex items-center ${
+              showTracking
+                ? 'bg-[#F35E4A] text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <Calendar className="h-5 w-5 mr-2" />
+            Weekly Tracking
+          </button>
+        </div>
+      )}
+
+      {/* Weekly Tracking Calendar */}
+      {showTracking && medications.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-md p-8">
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => {
+                const newDate = new Date(currentWeekStart);
+                newDate.setDate(newDate.getDate() - 7);
+                setCurrentWeekStart(newDate);
+              }}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+            >
+              <ChevronLeft className="h-6 w-6 text-gray-600" />
+            </button>
+            <h3 className="text-xl font-bold text-gray-900">
+              {currentWeekStart.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} - {' '}
+              {new Date(currentWeekStart.getTime() + 6 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            </h3>
+            <button
+              onClick={() => {
+                const newDate = new Date(currentWeekStart);
+                newDate.setDate(newDate.getDate() + 7);
+                setCurrentWeekStart(newDate);
+              }}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-all"
+            >
+              <ChevronRight className="h-6 w-6 text-gray-600" />
+            </button>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr>
+                  <th className="text-left p-4 border-b-2 border-gray-200 font-semibold text-gray-700">Medication</th>
+                  {getWeekDays(currentWeekStart).map((day, idx) => (
+                    <th key={idx} className="text-center p-4 border-b-2 border-gray-200 min-w-[100px]">
+                      <div className="text-sm font-semibold text-gray-700">
+                        {day.toLocaleDateString('en-US', { weekday: 'short' })}
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {trackingData.map((medData) => (
+                  <React.Fragment key={medData.id}>
+                    {(medData.times_of_day || []).map((time: string, timeIdx: number) => (
+                      <tr key={`${medData.id}-${time}`} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="p-4">
+                          <div className="flex items-center">
+                            <div className="bg-[#F35E4A] bg-opacity-10 rounded-lg p-2 mr-3">
+                              <Pill className="h-4 w-4 text-[#F35E4A]" />
+                            </div>
+                            <div>
+                              <div className="font-semibold text-gray-900 text-sm">{medData.name}</div>
+                              <div className="text-xs text-gray-600">{time}</div>
+                            </div>
+                          </div>
+                        </td>
+                        {getWeekDays(currentWeekStart).map((day, dayIdx) => {
+                          const tracking = medData.trackings?.find((t: any) => {
+                            const trackingDate = new Date(t.scheduled_datetime);
+                            return (
+                              trackingDate.toDateString() === day.toDateString() &&
+                              t.scheduled_datetime.includes(getTimeOfDayHour(time))
+                            );
+                          });
+
+                          return (
+                            <td key={dayIdx} className="p-4 text-center">
+                              {tracking ? (
+                                <div className="flex items-center justify-center">
+                                  {tracking.status === 'taken' && (
+                                    <div className="bg-green-100 rounded-full p-2" title="Taken">
+                                      <Check className="h-5 w-5 text-green-600" />
+                                    </div>
+                                  )}
+                                  {tracking.status === 'missed' && (
+                                    <div className="bg-red-100 rounded-full p-2" title="Missed">
+                                      <XIcon className="h-5 w-5 text-red-600" />
+                                    </div>
+                                  )}
+                                  {tracking.status === 'skipped' && (
+                                    <div className="bg-yellow-100 rounded-full p-2" title={tracking.notes || 'Skipped'}>
+                                      <AlertCircle className="h-5 w-5 text-yellow-600" />
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <div className="text-gray-300">
+                                  <div className="w-8 h-8 mx-auto bg-gray-100 rounded-full"></div>
+                                </div>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-6 flex items-center justify-center gap-6 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="bg-green-100 rounded-full p-2">
+                <Check className="h-4 w-4 text-green-600" />
+              </div>
+              <span className="text-gray-700">Taken</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="bg-red-100 rounded-full p-2">
+                <XIcon className="h-4 w-4 text-red-600" />
+              </div>
+              <span className="text-gray-700">Missed</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="bg-yellow-100 rounded-full p-2">
+                <AlertCircle className="h-4 w-4 text-yellow-600" />
+              </div>
+              <span className="text-gray-700">Skipped</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gray-100 rounded-full"></div>
+              <span className="text-gray-700">No Data</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Medications List */}
-      {medications.length > 0 ? (
+      {!showTracking && medications.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {medications.map((med) => (
             <div key={med.id} className="bg-white rounded-xl shadow-md p-6 border-2 border-gray-100 hover:border-[#F35E4A] transition-all">
@@ -313,6 +508,16 @@ const MedicationsSection: React.FC<MedicationsSectionProps> = ({ elderlyProfile 
       )}
     </div>
   );
+
+  function getTimeOfDayHour(timeOfDay: string): string {
+    const timeMap: { [key: string]: string } = {
+      'Morning': '08:',
+      'Afternoon': '13:',
+      'Evening': '20:',
+      'Night': '22:'
+    };
+    return timeMap[timeOfDay] || '08:';
+  }
 };
 
 export default MedicationsSection;
