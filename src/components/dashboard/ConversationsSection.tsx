@@ -40,8 +40,27 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
     try {
       setLoading(true);
       const data = await getCalls(elderlyProfile.id);
-      setCalls(data);
-      setFilteredCalls(data);
+
+      // Process calls to get the best transcript and summary for each
+      const processedCalls = data.map(call => {
+        // Find transcript with actual content (prefer ones with llm_call_summary)
+        const bestTranscript = call.call_transcripts?.find(t => t.llm_call_summary && t.transcript_text) ||
+                               call.call_transcripts?.find(t => t.transcript_text) ||
+                               call.call_transcripts?.[0];
+
+        // Find analysis with actual content
+        const bestAnalysis = call.call_analysis?.find(a => a.call_summary && a.call_summary.length > 0) ||
+                            call.call_analysis?.[0];
+
+        return {
+          ...call,
+          call_transcripts: bestTranscript ? [bestTranscript] : [],
+          call_analysis: bestAnalysis ? [bestAnalysis] : []
+        };
+      });
+
+      setCalls(processedCalls);
+      setFilteredCalls(processedCalls);
     } catch (error) {
       console.error('Error loading calls:', error);
     } finally {

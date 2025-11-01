@@ -207,6 +207,7 @@ export async function getCalls(elderlyProfileId: string, limit?: number) {
       call_transcripts(*)
     `)
     .eq('elderly_profile_id', elderlyProfileId)
+    .neq('call_type', 'onboarding')
     .order('created_at', { ascending: false });
 
   if (limit) {
