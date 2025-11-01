@@ -59,7 +59,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
       }).sort((a, b) => new Date(a.event_date).getTime() - new Date(b.event_date).getTime());
 
       setMedications(medsData);
-      setRecentCalls(callsData.slice(0, 5));
+      setRecentCalls(callsData.slice(0, 3));
       setUpcomingEvents(upcoming.slice(0, 3));
       setWeeklyLogs(logsData);
     } catch (error) {
@@ -204,11 +204,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
       {/* Two Column Layout - Medication and Conversations */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* 1. Medication Tracking */}
-        <div className="bg-white rounded-2xl shadow-md p-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="bg-white rounded-2xl shadow-md p-5">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
-            <Pill className="h-6 w-6 text-[#F35E4A] mr-3" />
-            <h3 className="text-2xl font-bold text-gray-900">Medication Tracking</h3>
+            <Pill className="h-5 w-5 text-[#F35E4A] mr-2" />
+            <h3 className="text-lg font-bold text-gray-900">Medication Tracking</h3>
           </div>
           <button
             onClick={() => onNavigate('medications')}
@@ -220,7 +220,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
         </div>
 
         {/* Weekly Adherence */}
-        <div className="grid grid-cols-7 gap-3 mb-6">
+        <div className="grid grid-cols-7 gap-2 mb-4">
           {getLast7Days().map((day, idx) => {
             const dayStr = day.toISOString().split('T')[0];
             const log = weeklyLogs.find(l => l.log_date === dayStr);
@@ -229,16 +229,16 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
             return (
               <div
                 key={idx}
-                className={`bg-gray-50 rounded-xl p-3 text-center border-2 transition-all ${
+                className={`bg-gray-50 rounded-lg p-2 text-center border-2 transition-all ${
                   isToday ? 'border-[#F35E4A] bg-[#F35E4A] bg-opacity-5' : 'border-gray-100'
                 }`}
               >
-                <div className={`text-xs font-semibold mb-1 ${
+                <div className={`text-xs font-semibold mb-0.5 ${
                   isToday ? 'text-[#F35E4A]' : 'text-gray-600'
                 }`}>
                   {day.toLocaleDateString('en-US', { weekday: 'short' })}
                 </div>
-                <div className={`text-sm font-bold mb-2 ${
+                <div className={`text-sm font-bold mb-1 ${
                   isToday ? 'text-[#F35E4A]' : 'text-gray-900'
                 }`}>
                   {day.getDate()}
@@ -246,16 +246,16 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
                 <div className="flex items-center justify-center">
                   {log ? (
                     log.medicine_taken ? (
-                      <div className="bg-green-100 rounded-full p-1.5">
-                        <Check className="h-4 w-4 text-green-600" />
+                      <div className="bg-green-100 rounded-full p-1">
+                        <Check className="h-3 w-3 text-green-600" />
                       </div>
                     ) : (
-                      <div className="bg-red-100 rounded-full p-1.5">
-                        <XIcon className="h-4 w-4 text-red-600" />
+                      <div className="bg-red-100 rounded-full p-1">
+                        <XIcon className="h-3 w-3 text-red-600" />
                       </div>
                     )
                   ) : (
-                    <div className="w-7 h-7 bg-gray-200 rounded-full"></div>
+                    <div className="w-5 h-5 bg-gray-200 rounded-full"></div>
                   )}
                 </div>
               </div>
@@ -264,12 +264,12 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-gray-50 rounded-xl p-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-gray-50 rounded-lg p-3">
             <p className="text-sm text-gray-600 mb-1">Adherence Rate</p>
             <p className="text-2xl font-bold text-gray-900">{getAdherenceRate()}%</p>
           </div>
-          <div className="bg-gray-50 rounded-xl p-4">
+          <div className="bg-gray-50 rounded-lg p-3">
             <p className="text-sm text-gray-600 mb-1">Total Medications</p>
             <p className="text-2xl font-bold text-gray-900">{medications.length}</p>
           </div>
@@ -277,11 +277,11 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
         </div>
 
         {/* 2. Call Conversations Tracking */}
-        <div className="bg-white rounded-2xl shadow-md p-8">
-        <div className="flex items-center justify-between mb-6">
+        <div className="bg-white rounded-2xl shadow-md p-5">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
-            <MessageCircle className="h-6 w-6 text-[#F35E4A] mr-3" />
-            <h3 className="text-2xl font-bold text-gray-900">Recent Conversations</h3>
+            <MessageCircle className="h-5 w-5 text-[#F35E4A] mr-2" />
+            <h3 className="text-lg font-bold text-gray-900">Recent Conversations</h3>
           </div>
           <button
             onClick={() => onNavigate('conversations')}
@@ -293,22 +293,23 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
         </div>
 
         {recentCalls.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {recentCalls.map((call) => (
-              <div key={call.id} className="flex items-start p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all">
-                <div className="bg-[#F35E4A] bg-opacity-10 rounded-full p-3 mr-4">
-                  <Phone className="h-5 w-5 text-[#F35E4A]" />
+              <div key={call.id} className="flex items-start p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all">
+                <div className="bg-[#F35E4A] bg-opacity-10 rounded-full p-2 mr-3">
+                  <Phone className="h-4 w-4 text-[#F35E4A]" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
-                    <p className="font-semibold text-gray-900">
-                      {call.call_type === 'daily_checkin' ? 'Daily Check-in' :
-                       call.call_type === 'phone_call' ? 'Phone Call' :
-                       call.call_type === 'onboarding' ? 'Onboarding Call' :
-                       'Call'}
+                    <p className="font-semibold text-gray-900 text-sm truncate">
+                      {call.llm_call_summary ||
+                       (call.call_type === 'daily_checkin' ? 'Daily Check-in' :
+                        call.call_type === 'phone_call' ? 'Call Summary' :
+                        call.call_type === 'onboarding' ? 'Onboarding Call' :
+                        'Call')}
                     </p>
                     {call.call_status && call.call_status !== '' && (
-                      <span className={`text-xs px-2 py-1 rounded-full ${
+                      <span className={`text-xs px-2 py-0.5 rounded-full whitespace-nowrap ml-2 ${
                         call.call_status === 'successful' || call.call_status === 'registered'
                           ? 'bg-green-100 text-green-700'
                           : call.call_status === 'voicemail'
@@ -319,7 +320,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs text-gray-600">
                     {call.created_at ? new Date(call.created_at).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -327,8 +328,8 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
                       minute: '2-digit',
                     }) : 'Date not available'}
                   </p>
-                  {call.duration_seconds && (
-                    <p className="text-xs text-gray-500 mt-1">
+                  {call.duration_seconds !== undefined && call.duration_seconds !== null && (
+                    <p className="text-xs text-gray-500 mt-0.5">
                       Duration: {Math.floor(call.duration_seconds / 60)}m {call.duration_seconds % 60}s
                     </p>
                   )}

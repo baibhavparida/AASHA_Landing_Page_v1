@@ -208,7 +208,7 @@ export async function getCalls(elderlyProfileId: string, limit?: number) {
     .select(`
       *,
       call_analysis(*),
-      call_transcripts(*)
+      call_transcripts(llm_call_summary)
     `)
     .eq('elderly_profile_id', elderlyProfileId)
     .neq('call_type', 'onboarding')
@@ -225,7 +225,13 @@ export async function getCalls(elderlyProfileId: string, limit?: number) {
     throw error;
   }
 
-  return data || [];
+  // Flatten the call_transcripts array to get llm_call_summary
+  const processedData = (data || []).map(call => ({
+    ...call,
+    llm_call_summary: call.call_transcripts?.[0]?.llm_call_summary || null
+  }));
+
+  return processedData;
 }
 
 export async function getCall(callId: string) {
