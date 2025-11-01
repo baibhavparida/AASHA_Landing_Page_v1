@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { MessageCircle, Clock, Search, ChevronRight, X, FileText } from 'lucide-react';
-import { getCalls, getCall } from '../../services/dashboardService';
+import { MessageCircle, Clock, Search, ChevronRight, X, FileText, Sun, Moon, Save } from 'lucide-react';
+import { getCalls, getCall, updateElderlyProfile } from '../../services/dashboardService';
 
 interface ConversationsSectionProps {
   elderlyProfile: {
     id: string;
+    call_time_preference: string;
   };
+  onUpdate: () => void;
 }
 
-const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProfile }) => {
+const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProfile, onUpdate }) => {
   const [calls, setCalls] = useState<any[]>([]);
   const [filteredCalls, setFilteredCalls] = useState<any[]>([]);
   const [selectedCall, setSelectedCall] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showTranscript, setShowTranscript] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedTime, setSelectedTime] = useState(elderlyProfile.call_time_preference);
+  const [savingSchedule, setSavingSchedule] = useState(false);
 
   useEffect(() => {
     loadCalls();
@@ -86,6 +90,48 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
     return `${hours}h ${mins}m`;
   };
 
+  const timeOptions = [
+    {
+      id: 'morning',
+      label: 'Morning',
+      time: '6:00 AM - 12:00 PM',
+      icon: Sun,
+      gradient: 'from-yellow-400 to-orange-400',
+    },
+    {
+      id: 'afternoon',
+      label: 'Afternoon',
+      time: '12:00 PM - 5:00 PM',
+      icon: Sun,
+      gradient: 'from-orange-400 to-red-400',
+    },
+    {
+      id: 'evening',
+      label: 'Evening',
+      time: '5:00 PM - 9:00 PM',
+      icon: Moon,
+      gradient: 'from-blue-400 to-indigo-400',
+    },
+  ];
+
+  const handleSaveSchedule = async () => {
+    try {
+      setSavingSchedule(true);
+      await updateElderlyProfile(elderlyProfile.id, {
+        call_time_preference: selectedTime,
+      });
+      await onUpdate();
+      alert('Call schedule updated successfully!');
+    } catch (error) {
+      console.error('Error updating call schedule:', error);
+      alert('Failed to update call schedule');
+    } finally {
+      setSavingSchedule(false);
+    }
+  };
+
+  const hasScheduleChanges = selectedTime !== elderlyProfile.call_time_preference;
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -99,7 +145,93 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
       {/* Header */}
       <div className="bg-white rounded-2xl shadow-md p-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">My Calls</h2>
-        <p className="text-gray-600">Review your call history with Aasha</p>
+        <p className="text-gray-600">Manage your call schedule and review your call history with Aasha</p>
+      </div>
+
+      {/* Call Schedule Section */}
+      <div className="bg-white rounded-2xl shadow-md p-8">
+        <h3 className="text-2xl font-bold text-gray-900 mb-6">Call Schedule Preferences</h3>
+
+        {/* Current Schedule */}
+        <div className="bg-gradient-to-r from-[#F35E4A] to-[#e54d37] rounded-xl shadow-lg p-6 text-white mb-6">
+          <div className="flex items-center mb-2">
+            <Clock className="h-6 w-6 mr-2" />
+            <h4 className="text-lg font-bold">Current Preference</h4>
+          </div>
+          <p className="text-xl opacity-90">
+            {timeOptions.find((opt) => opt.id === elderlyProfile.call_time_preference)?.label || 'Not set'}
+          </p>
+          <p className="text-base opacity-75 mt-1">
+            {timeOptions.find((opt) => opt.id === elderlyProfile.call_time_preference)?.time || ''}
+          </p>
+        </div>
+
+        {/* Time Options */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {timeOptions.map((option) => {
+            const Icon = option.icon;
+            const isSelected = selectedTime === option.id;
+            return (
+              <button
+                key={option.id}
+                onClick={() => setSelectedTime(option.id)}
+                className={`relative bg-white rounded-xl shadow-sm p-4 text-left transition-all ${
+                  isSelected
+                    ? 'ring-2 ring-[#F35E4A] border-2 border-[#F35E4A]'
+                    : 'border-2 border-gray-200 hover:border-[#F35E4A]'
+                }`}
+              >
+                {isSelected && (
+                  <div className="absolute top-3 right-3 bg-[#F35E4A] rounded-full p-1">
+                    <svg
+                      className="h-3 w-3 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                )}
+                <div className={`bg-gradient-to-r ${option.gradient} rounded-lg p-3 mb-3 inline-block`}>
+                  <Icon className="h-6 w-6 text-white" />
+                </div>
+                <h5 className="text-lg font-bold text-gray-900 mb-1">{option.label}</h5>
+                <p className="text-sm text-[#F35E4A] font-semibold">{option.time}</p>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Save Button */}
+        {hasScheduleChanges && (
+          <div className="bg-gray-50 rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-gray-900 text-sm">You have unsaved changes</p>
+              <p className="text-xs text-gray-600">Click save to update your call schedule</p>
+            </div>
+            <button
+              onClick={handleSaveSchedule}
+              disabled={savingSchedule}
+              className="flex items-center bg-[#F35E4A] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#e54d37] transition-all disabled:opacity-50 text-sm"
+            >
+              {savingSchedule ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Search */}

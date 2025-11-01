@@ -23,7 +23,7 @@ import ConversationsSection from './dashboard/ConversationsSection';
 import InterestsSection from './dashboard/InterestsSection';
 import SpecialEventsSection from './dashboard/SpecialEventsSection';
 import SettingsSection from './dashboard/SettingsSection';
-type Section = 'home' | 'profile' | 'medications' | 'call-schedule' | 'conversations' | 'interests' | 'events' | 'settings';
+type Section = 'home' | 'profile' | 'medications' | 'conversations' | 'interests' | 'events' | 'settings';
 
 interface ElderlyProfile {
   id: string;
@@ -76,7 +76,6 @@ const Dashboard: React.FC = () => {
     { id: 'home', label: 'Home', icon: Home },
     { id: 'profile', label: 'My Profile', icon: User },
     { id: 'medications', label: 'Medications', icon: Pill },
-    { id: 'call-schedule', label: 'Call Schedule', icon: Clock },
     { id: 'conversations', label: 'My Calls', icon: MessageCircle },
     { id: 'interests', label: 'My Interests', icon: Heart },
     { id: 'events', label: 'Special Events', icon: Calendar },
@@ -98,10 +97,8 @@ const Dashboard: React.FC = () => {
         return <ProfileSection elderlyProfile={elderlyProfile} onUpdate={loadProfile} />;
       case 'medications':
         return <MedicationsSection elderlyProfile={elderlyProfile} />;
-      case 'call-schedule':
-        return <CallScheduleSection elderlyProfile={elderlyProfile} onUpdate={loadProfile} />;
       case 'conversations':
-        return <ConversationsSection elderlyProfile={elderlyProfile} />;
+        return <ConversationsSection elderlyProfile={elderlyProfile} onUpdate={loadProfile} />;
       case 'interests':
         return <InterestsSection elderlyProfile={elderlyProfile} />;
       case 'events':
@@ -227,6 +224,17 @@ const Dashboard: React.FC = () => {
               })}
             </ul>
           </nav>
+
+          {/* Logout Button */}
+          <div className="p-4 border-t border-gray-200">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center px-4 py-3 rounded-lg text-left transition-all text-gray-700 hover:bg-gray-100"
+            >
+              <LogOut className="h-6 w-6 mr-3" />
+              <span className="text-base font-medium">Logout</span>
+            </button>
+          </div>
         </div>
       </aside>
 
@@ -234,23 +242,16 @@ const Dashboard: React.FC = () => {
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Top Bar */}
         <header className="bg-white border-b border-gray-200 p-4 lg:p-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden text-gray-700 hover:text-[#F35E4A]"
+              className="lg:hidden text-gray-700 hover:text-[#F35E4A] mr-4"
             >
               <Menu className="h-6 w-6" />
             </button>
             <h1 className="text-xl font-bold text-gray-900">
               {menuItems.find((item) => item.id === currentSection)?.label || 'Dashboard'}
             </h1>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all text-sm font-medium"
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Logout</span>
-            </button>
           </div>
         </header>
 
