@@ -201,8 +201,10 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
         )}
       </div>
 
-      {/* 1. Medication Tracking - Primary Focus */}
-      <div className="bg-white rounded-2xl shadow-md p-8">
+      {/* Two Column Layout - Medication and Conversations */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* 1. Medication Tracking */}
+        <div className="bg-white rounded-2xl shadow-md p-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             <Pill className="h-6 w-6 text-[#F35E4A] mr-3" />
@@ -272,10 +274,10 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
             <p className="text-2xl font-bold text-gray-900">{medications.length}</p>
           </div>
         </div>
-      </div>
+        </div>
 
-      {/* 2. Call Conversations Tracking */}
-      <div className="bg-white rounded-2xl shadow-md p-8">
+        {/* 2. Call Conversations Tracking */}
+        <div className="bg-white rounded-2xl shadow-md p-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
             <MessageCircle className="h-6 w-6 text-[#F35E4A] mr-3" />
@@ -300,25 +302,30 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
                     <p className="font-semibold text-gray-900">
-                      {call.call_type === 'daily_checkin' ? 'Daily Check-in' : 'Onboarding Call'}
+                      {call.call_type === 'daily_checkin' ? 'Daily Check-in' :
+                       call.call_type === 'phone_call' ? 'Phone Call' :
+                       call.call_type === 'onboarding' ? 'Onboarding Call' :
+                       'Call'}
                     </p>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      call.call_status === 'successful'
-                        ? 'bg-green-100 text-green-700'
-                        : call.call_status === 'voicemail'
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-red-100 text-red-700'
-                    }`}>
-                      {call.call_status}
-                    </span>
+                    {call.call_status && call.call_status !== '' && (
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        call.call_status === 'successful' || call.call_status === 'registered'
+                          ? 'bg-green-100 text-green-700'
+                          : call.call_status === 'voicemail'
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-red-100 text-red-700'
+                      }`}>
+                        {call.call_status}
+                      </span>
+                    )}
                   </div>
                   <p className="text-sm text-gray-600">
-                    {new Date(call.started_at).toLocaleDateString('en-US', {
+                    {call.created_at ? new Date(call.created_at).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                       hour: 'numeric',
                       minute: '2-digit',
-                    })}
+                    }) : 'Date not available'}
                   </p>
                   {call.duration_seconds && (
                     <p className="text-xs text-gray-500 mt-1">
@@ -341,6 +348,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
             </button>
           </div>
         )}
+        </div>
       </div>
 
       {/* 3. Upcoming Events */}
