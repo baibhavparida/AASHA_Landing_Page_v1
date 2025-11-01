@@ -26,9 +26,10 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
     } else {
       const filtered = calls.filter(
         (call) => {
-          const summary = call.call_analysis?.[0]?.call_summary || '';
+          const summary = call.call_analysis?.[0]?.call_summary || call.call_transcripts?.[0]?.llm_call_summary || '';
+          const dateStr = call.created_at ? new Date(call.created_at).toLocaleDateString() : '';
           return summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            new Date(call.started_at).toLocaleDateString().includes(searchQuery);
+            dateStr.includes(searchQuery);
         }
       );
       setFilteredCalls(filtered);
@@ -101,7 +102,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
         <div className="space-y-4">
           {filteredCalls.map((call) => {
             const analysis = call.call_analysis?.[0];
-            const summary = analysis?.call_summary || 'No summary available';
+            const summary = analysis?.call_summary || call.call_transcripts?.[0]?.llm_call_summary || 'No summary available';
             return (
               <div
                 key={call.id}
@@ -116,7 +117,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
                     <div className="flex-1">
                       <div className="flex items-center mb-2">
                         <h3 className="text-lg font-bold text-gray-900">
-                          {new Date(call.started_at).toLocaleDateString('en-US', {
+                          {new Date(call.created_at).toLocaleDateString('en-US', {
                             weekday: 'long',
                             year: 'numeric',
                             month: 'long',
@@ -160,7 +161,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900">
-                    {new Date(selectedCall.started_at).toLocaleDateString('en-US', {
+                    {new Date(selectedCall.created_at).toLocaleDateString('en-US', {
                       weekday: 'long',
                       year: 'numeric',
                       month: 'long',
@@ -189,7 +190,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
                   <h4 className="text-lg font-bold text-gray-900 mb-3">Call Summary</h4>
                   <div className="bg-gray-50 rounded-lg p-4">
                     <p className="text-gray-700 leading-relaxed">
-                      {selectedCall.call_analysis?.[0]?.call_summary || 'No summary available'}
+                      {selectedCall.call_analysis?.[0]?.call_summary || selectedCall.call_transcripts?.[0]?.llm_call_summary || 'No summary available'}
                     </p>
                   </div>
                 </div>
