@@ -28,7 +28,7 @@ import FamilyContentUpload from './family/FamilyContentUpload';
 import FamilyAlertsSection from './family/FamilyAlertsSection';
 import FamilySettingsSection from './family/FamilySettingsSection';
 
-type Section = 'home' | 'profile' | 'medications' | 'call-schedule' | 'conversations' | 'interests' | 'events' | 'content' | 'alerts' | 'settings';
+type Section = 'home' | 'profile' | 'medications' | 'conversations' | 'interests' | 'events' | 'content' | 'alerts' | 'settings';
 
 interface ElderlyProfile {
   id: string;
@@ -83,7 +83,6 @@ const FamilyDashboard: React.FC = () => {
     { id: 'home', label: 'Home', icon: Home },
     { id: 'profile', label: 'Loved One Profile', icon: User },
     { id: 'medications', label: 'Medications', icon: Pill },
-    { id: 'call-schedule', label: 'Call Schedule', icon: Clock },
     { id: 'conversations', label: 'Conversations', icon: MessageCircle },
     { id: 'interests', label: 'Interests & Topics', icon: Heart },
     { id: 'events', label: 'Special Events', icon: Calendar },
@@ -107,10 +106,8 @@ const FamilyDashboard: React.FC = () => {
         return <ElderlyProfileOverview elderlyProfile={elderlyProfile} onUpdate={loadProfile} />;
       case 'medications':
         return <FamilyMedicationManagement elderlyProfile={elderlyProfile} />;
-      case 'call-schedule':
-        return <FamilyCallSchedule elderlyProfile={elderlyProfile} onUpdate={loadProfile} />;
       case 'conversations':
-        return <FamilyConversationsSection elderlyProfile={elderlyProfile} />;
+        return <FamilyConversationsSection elderlyProfile={elderlyProfile} onUpdate={loadProfile} />;
       case 'interests':
         return <FamilyInterestsSection elderlyProfile={elderlyProfile} />;
       case 'events':
@@ -245,28 +242,32 @@ const FamilyDashboard: React.FC = () => {
               })}
             </ul>
           </nav>
+
+          {/* Logout Button */}
+          <div className="p-4 border-t border-gray-200">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center px-4 py-3 rounded-lg text-left transition-all text-gray-700 hover:bg-gray-100"
+            >
+              <LogOut className="h-6 w-6 mr-3" />
+              <span className="text-base font-medium">Logout</span>
+            </button>
+          </div>
         </div>
       </aside>
 
       <div className="flex-1 flex flex-col min-h-screen">
         <header className="bg-white border-b border-gray-200 p-4 lg:p-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center">
             <button
               onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden text-gray-700 hover:text-[#F35E4A]"
+              className="lg:hidden text-gray-700 hover:text-[#F35E4A] mr-4"
             >
               <Menu className="h-6 w-6" />
             </button>
             <h1 className="text-xl font-bold text-gray-900">
               {menuItems.find((item) => item.id === currentSection)?.label || 'Family Dashboard'}
             </h1>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all text-sm font-medium"
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Logout</span>
-            </button>
           </div>
         </header>
 

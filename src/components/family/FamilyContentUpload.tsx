@@ -118,26 +118,15 @@ const FamilyContentUpload: React.FC<FamilyContentUploadProps> = ({ elderlyProfil
   }
 
   return (
-    <div className="space-y-8">
-      <div className="bg-white rounded-2xl shadow-md p-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <Upload className="h-8 w-8 text-[#F35E4A] mr-3" />
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Share Content with {elderlyProfile.first_name}
-              </h2>
-              <p className="text-gray-600 mt-1">Upload family news and updates for Aasha to discuss</p>
-            </div>
-          </div>
-          <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all flex items-center"
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            Add Content
-          </button>
-        </div>
+    <div className="space-y-6">
+      <div className="flex justify-end">
+        <button
+          onClick={() => setShowAddForm(!showAddForm)}
+          className="bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all flex items-center"
+        >
+          <Plus className="h-5 w-5 mr-2" />
+          Add Content
+        </button>
       </div>
 
       {showAddForm && (

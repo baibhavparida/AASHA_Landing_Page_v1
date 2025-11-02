@@ -81,20 +81,8 @@ const FamilyAlertsSection: React.FC<FamilyAlertsSectionProps> = ({ elderlyProfil
   }
 
   return (
-    <div className="space-y-8">
-      <div className="bg-white rounded-2xl shadow-md p-8">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <Bell className="h-8 w-8 text-[#F35E4A] mr-3" />
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Alerts for {elderlyProfile.first_name}
-              </h2>
-              <p className="text-gray-600 mt-1">Monitor important notifications and health alerts</p>
-            </div>
-          </div>
-        </div>
-
+    <div className="space-y-6">
+      <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex items-center gap-2">
             <Filter className="h-5 w-5 text-gray-600" />
