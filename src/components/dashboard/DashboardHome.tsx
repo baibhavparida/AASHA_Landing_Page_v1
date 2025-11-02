@@ -481,39 +481,45 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
           </div>
 
           {interests.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {interests.map((interest) => {
                 const getInterestIcon = (interestName: string) => {
                   const name = interestName.toLowerCase();
-                  if (name.includes('read')) return <Book className="h-3.5 w-3.5" />;
-                  if (name.includes('music')) return <Music className="h-3.5 w-3.5" />;
-                  if (name.includes('art') || name.includes('craft') || name.includes('paint') || name.includes('draw')) return <Palette className="h-3.5 w-3.5" />;
-                  if (name.includes('sport') || name.includes('game')) return <Trophy className="h-3.5 w-3.5" />;
-                  if (name.includes('tv') || name.includes('show') || name.includes('watch')) return <Tv className="h-3.5 w-3.5" />;
-                  if (name.includes('cook') || name.includes('bak') || name.includes('food')) return <Utensils className="h-3.5 w-3.5" />;
-                  if (name.includes('photo')) return <Camera className="h-3.5 w-3.5" />;
-                  if (name.includes('travel')) return <Plane className="h-3.5 w-3.5" />;
-                  if (name.includes('garden') || name.includes('plant')) return <Flower2 className="h-3.5 w-3.5" />;
-                  if (name.includes('dog')) return <Dog className="h-3.5 w-3.5" />;
-                  if (name.includes('bird')) return <Bird className="h-3.5 w-3.5" />;
-                  if (name.includes('nature') || name.includes('outdoor')) return <TreePine className="h-3.5 w-3.5" />;
-                  if (name.includes('exercise') || name.includes('fitness') || name.includes('gym')) return <Dumbbell className="h-3.5 w-3.5" />;
-                  if (name.includes('video game') || name.includes('gaming')) return <Gamepad2 className="h-3.5 w-3.5" />;
-                  if (name.includes('shop')) return <ShoppingBag className="h-3.5 w-3.5" />;
-                  if (name.includes('movie') || name.includes('film')) return <Film className="h-3.5 w-3.5" />;
-                  if (name.includes('learn') || name.includes('study') || name.includes('educat')) return <GraduationCap className="h-3.5 w-3.5" />;
-                  if (name.includes('theater') || name.includes('drama')) return <Theater className="h-3.5 w-3.5" />;
-                  if (name.includes('coffee') || name.includes('tea')) return <Coffee className="h-3.5 w-3.5" />;
-                  return <Sparkles className="h-3.5 w-3.5" />;
+                  if (name.includes('read')) return <Book className="h-5 w-5" />;
+                  if (name.includes('music')) return <Music className="h-5 w-5" />;
+                  if (name.includes('art') || name.includes('craft') || name.includes('paint') || name.includes('draw')) return <Palette className="h-5 w-5" />;
+                  if (name.includes('sport') || name.includes('game')) return <Trophy className="h-5 w-5" />;
+                  if (name.includes('tv') || name.includes('show') || name.includes('watch')) return <Tv className="h-5 w-5" />;
+                  if (name.includes('cook') || name.includes('bak') || name.includes('food')) return <Utensils className="h-5 w-5" />;
+                  if (name.includes('photo')) return <Camera className="h-5 w-5" />;
+                  if (name.includes('travel')) return <Plane className="h-5 w-5" />;
+                  if (name.includes('garden') || name.includes('plant')) return <Flower2 className="h-5 w-5" />;
+                  if (name.includes('dog')) return <Dog className="h-5 w-5" />;
+                  if (name.includes('bird')) return <Bird className="h-5 w-5" />;
+                  if (name.includes('nature') || name.includes('outdoor')) return <TreePine className="h-5 w-5" />;
+                  if (name.includes('exercise') || name.includes('fitness') || name.includes('gym')) return <Dumbbell className="h-5 w-5" />;
+                  if (name.includes('video game') || name.includes('gaming')) return <Gamepad2 className="h-5 w-5" />;
+                  if (name.includes('shop')) return <ShoppingBag className="h-5 w-5" />;
+                  if (name.includes('movie') || name.includes('film')) return <Film className="h-5 w-5" />;
+                  if (name.includes('learn') || name.includes('study') || name.includes('educat')) return <GraduationCap className="h-5 w-5" />;
+                  if (name.includes('theater') || name.includes('drama')) return <Theater className="h-5 w-5" />;
+                  if (name.includes('coffee') || name.includes('tea')) return <Coffee className="h-5 w-5" />;
+                  return <Sparkles className="h-5 w-5" />;
                 };
                 return (
-                  <span
+                  <div
                     key={interest.id}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F35E4A] bg-opacity-10 text-[#F35E4A] rounded-full text-sm font-medium"
+                    className="bg-[#FEF2F2] border border-[#F35E4A] border-opacity-20 rounded-lg p-3 flex items-center gap-3 hover:shadow-md transition-all"
                   >
-                    {getInterestIcon(interest.interest)}
-                    {interest.interest}
-                  </span>
+                    <div className="bg-[#F35E4A] bg-opacity-10 rounded-lg p-2 flex-shrink-0">
+                      <div className="text-[#F35E4A]">
+                        {getInterestIcon(interest.interest)}
+                      </div>
+                    </div>
+                    <span className="text-sm font-semibold text-gray-900 capitalize">
+                      {interest.interest}
+                    </span>
+                  </div>
                 );
               })}
             </div>
