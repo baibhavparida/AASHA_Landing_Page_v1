@@ -222,19 +222,21 @@ const Dashboard: React.FC = () => {
                   </li>
                 );
               })}
+              {/* Logout Button */}
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center px-4 py-3 rounded-lg text-left transition-all text-gray-700 hover:bg-gray-100"
+                >
+                  <LogOut className="h-6 w-6 mr-3" />
+                  <span className="text-base font-medium">Logout</span>
+                </button>
+              </li>
             </ul>
           </nav>
 
-          {/* Logout Button */}
-          <div className="p-4 border-t border-gray-200">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center px-4 py-3 rounded-lg text-left transition-all text-gray-700 hover:bg-gray-100"
-            >
-              <LogOut className="h-6 w-6 mr-3" />
-              <span className="text-base font-medium">Logout</span>
-            </button>
-          </div>
+          {/* Empty spacer for bottom padding */}
+          <div className="p-4"></div>
         </div>
       </aside>
 
