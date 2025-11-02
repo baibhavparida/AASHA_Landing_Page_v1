@@ -218,7 +218,9 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
             const analysis = call.call_analysis?.[0];
             const summary = analysis?.call_summary || call.call_transcripts?.[0]?.llm_call_summary || 'No summary available';
             const callDate = new Date(call.created_at);
-            const dateStr = callDate.toLocaleDateString('en-US', {
+
+            const callTitle = callDate.toLocaleDateString('en-US', {
+              weekday: 'long',
               month: 'short',
               day: 'numeric',
             });
@@ -227,6 +229,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
               minute: '2-digit',
               hour12: true,
             });
+
             return (
               <div
                 key={call.id}
@@ -238,11 +241,14 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
                     <MessageCircle className="h-7 w-7 text-[#F35E4A]" />
                   </div>
                   <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-semibold text-gray-900 mb-2">
+                      {callTitle}
+                    </h3>
                     <p className="text-base text-gray-900 mb-3 leading-relaxed">
                       {summary}
                     </p>
                     <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <span>{dateStr}, {timeStr}</span>
+                      <span>{timeStr}</span>
                       <span>Duration: {formatDuration(call.duration_seconds)}</span>
                     </div>
                   </div>
