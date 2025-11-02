@@ -208,7 +208,7 @@ export async function getCalls(elderlyProfileId: string, limit?: number) {
     .select(`
       *,
       call_analysis(*),
-      call_transcripts(llm_call_summary)
+      call_transcripts(*)
     `)
     .eq('elderly_profile_id', elderlyProfileId)
     .neq('call_type', 'onboarding')
