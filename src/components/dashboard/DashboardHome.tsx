@@ -58,6 +58,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
   const [callError, setCallError] = useState<string | null>(null);
   const [callSuccess, setCallSuccess] = useState(false);
   const [selectedWeekOffset, setSelectedWeekOffset] = useState(0);
+  const [selectedCall, setSelectedCall] = useState<any>(null);
 
   useEffect(() => {
     loadDashboardData();
@@ -357,30 +358,44 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
               const formatDuration = (seconds: number) => {
                 const minutes = Math.floor(seconds / 60);
                 const secs = seconds % 60;
-                return `${minutes}:${secs.toString().padStart(2, '0')}`;
+                if (minutes < 60) return `${minutes}:${secs.toString().padStart(2, '0')}`;
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                return `${hours}h ${mins}m`;
               };
+              const callDate = new Date(call.created_at);
+              const callTitle = callDate.toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric',
+              });
+              const timeStr = callDate.toLocaleTimeString('en-US', {
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true,
+              });
               return (
-                <div key={call.id} className="flex items-start p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all cursor-pointer">
-                  <div className="bg-[#F35E4A] bg-opacity-10 rounded-lg p-2 mr-3">
-                    <Phone className="h-5 w-5 text-[#F35E4A]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 text-sm mb-1 line-clamp-1">
-                      {summary}
-                    </p>
-                    <p className="text-xs text-gray-600">
-                      {call.created_at ? new Date(call.created_at).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      }) : 'Date not available'}
-                    </p>
-                    {call.duration_seconds !== undefined && call.duration_seconds !== null && (
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        Duration: {formatDuration(call.duration_seconds)}
+                <div
+                  key={call.id}
+                  className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-all cursor-pointer"
+                  onClick={() => setSelectedCall(call)}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="bg-[#FEF2F2] rounded-lg p-2.5 flex-shrink-0">
+                      <MessageCircle className="h-5 w-5 text-[#F35E4A]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-semibold text-gray-900 mb-1">
+                        {callTitle}
+                      </h4>
+                      <p className="text-sm text-gray-900 mb-2 leading-relaxed line-clamp-2">
+                        {summary}
                       </p>
-                    )}
+                      <div className="flex items-center gap-3 text-xs text-gray-600">
+                        <span>{timeStr}</span>
+                        <span>Duration: {formatDuration(call.duration_seconds)}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
@@ -516,6 +531,86 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
           )}
         </div>
       </div>
+
+      {/* Call Detail Modal */}
+      {selectedCall && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    {new Date(selectedCall.created_at).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </h3>
+                  <p className="text-gray-600 mt-1 flex items-center">
+                    <Clock className="h-4 w-4 mr-1" />
+                    Duration: {(() => {
+                      const seconds = selectedCall.duration_seconds;
+                      const minutes = Math.floor(seconds / 60);
+                      const secs = seconds % 60;
+                      if (minutes < 60) return `${minutes}:${secs.toString().padStart(2, '0')}`;
+                      const hours = Math.floor(minutes / 60);
+                      const mins = minutes % 60;
+                      return `${hours}h ${mins}m`;
+                    })()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedCall(null)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <XIcon className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="space-y-6">
+                {/* Summary */}
+                {(selectedCall.call_analysis?.[0]?.call_summary || selectedCall.call_transcripts?.[0]?.llm_call_summary) && (
+                  <div>
+                    <h4 className="text-lg font-bold text-gray-900 mb-3">Call Summary</h4>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <p className="text-gray-700 leading-relaxed">
+                        {selectedCall.call_analysis?.[0]?.call_summary || selectedCall.call_transcripts?.[0]?.llm_call_summary}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Full Transcript */}
+                {selectedCall.call_transcripts?.[0]?.transcript_text && (
+                  <div>
+                    <h4 className="text-lg font-bold text-gray-900 mb-3">Full Transcript</h4>
+                    <div className="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
+                      <pre className="text-gray-700 whitespace-pre-wrap leading-relaxed font-sans">
+                        {selectedCall.call_transcripts?.[0]?.transcript_text}
+                      </pre>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-gray-200">
+              <button
+                onClick={() => setSelectedCall(null)}
+                className="w-full bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
