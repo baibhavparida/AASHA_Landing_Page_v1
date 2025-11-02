@@ -68,6 +68,11 @@ const InterestsSection: React.FC<InterestsSectionProps> = ({ elderlyProfile }) =
       if (prev.includes(interestId)) {
         return prev.filter((id) => id !== interestId);
       } else {
+        const totalInterests = selectedInterests.length + prev.length;
+        if (totalInterests >= 3) {
+          alert('You can only select up to 3 interests');
+          return prev;
+        }
         return [...prev, interestId];
       }
     });
@@ -130,11 +135,13 @@ const InterestsSection: React.FC<InterestsSectionProps> = ({ elderlyProfile }) =
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* Action Button */}
-      <div className="flex justify-end">
+      {/* Header and Action Button */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold text-gray-900">My Interests</h2>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all shadow-md"
+          disabled={selectedInterests.length >= 3}
+          className="flex items-center bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Plus className="h-5 w-5 mr-2" />
           Add Interest
@@ -148,8 +155,7 @@ const InterestsSection: React.FC<InterestsSectionProps> = ({ elderlyProfile }) =
           <div>
             <h4 className="font-semibold text-blue-900 mb-1">How Interests Help</h4>
             <p className="text-blue-800 text-sm">
-              The interests you select help Aasha tailor conversations to topics you enjoy. The more interests you add,
-              the more personalized and engaging your chats will be!
+              Select up to 3 interests that help Aasha tailor conversations to topics you enjoy.
             </p>
           </div>
         </div>

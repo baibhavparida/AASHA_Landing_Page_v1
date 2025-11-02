@@ -139,8 +139,9 @@ const SpecialEventsSection: React.FC<SpecialEventsSectionProps> = ({ elderlyProf
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* Action Button */}
-      <div className="flex justify-end">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold text-gray-900">Special Events</h2>
         <button
           onClick={() => setShowAddModal(true)}
           className="flex items-center bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all shadow-md"

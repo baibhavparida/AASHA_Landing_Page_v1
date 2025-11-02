@@ -61,9 +61,12 @@ const CallScheduleSection: React.FC<CallScheduleSectionProps> = ({ elderlyProfil
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      {/* Page Header */}
+      <h2 className="text-3xl font-bold text-gray-900">Call Schedule</h2>
+
       {/* Header */}
       <div className="bg-white rounded-2xl shadow-md p-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Call Schedule Preferences</h2>
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">Call Schedule Preferences</h3>
         <p className="text-gray-600">
           Choose when you'd like Aasha to call you. You can change this anytime.
         </p>

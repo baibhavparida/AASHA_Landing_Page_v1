@@ -70,6 +70,9 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ elderlyProfile, onUpdat
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
+      {/* Page Header */}
+      <h2 className="text-3xl font-bold text-gray-900">My Profile</h2>
+
       {/* Profile Header */}
       <div className="bg-white rounded-2xl shadow-md p-8">
         <div className="flex flex-col md:flex-row items-center md:items-start">

@@ -142,6 +142,9 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      {/* Page Header */}
+      <h2 className="text-3xl font-bold text-gray-900">My Calls</h2>
+
       {/* Call Schedule Section - Compact */}
       <div className="bg-white rounded-xl shadow-sm p-5">
         <div className="flex items-center justify-between mb-4">

@@ -45,9 +45,17 @@ const InterestsStep: React.FC<InterestsStepProps> = ({ data, updateData, onNext,
   ];
 
   const toggleInterest = (id: string) => {
-    setSelectedInterests((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+    setSelectedInterests((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((i) => i !== id);
+      } else {
+        if (prev.length >= 3) {
+          alert('You can only select up to 3 interests');
+          return prev;
+        }
+        return [...prev, id];
+      }
+    });
   };
 
   const handleSubmit = async () => {
@@ -85,7 +93,7 @@ const InterestsStep: React.FC<InterestsStepProps> = ({ data, updateData, onNext,
         What interests you?
       </h2>
       <p className="text-gray-600 mb-8">
-        Select topics you enjoy discussing with Aasha.
+        Select up to 3 topics you enjoy discussing with Aasha.
       </p>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

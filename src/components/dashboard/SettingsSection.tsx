@@ -17,6 +17,9 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({ elderlyProfile }) => 
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {/* Page Header */}
+      <h2 className="text-3xl font-bold text-gray-900">Settings</h2>
+
       {/* Notifications */}
       <div className="bg-white rounded-2xl shadow-md p-8">
         <div className="flex items-center mb-6">
