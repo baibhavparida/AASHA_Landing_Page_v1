@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, Phone, MessageCircle } from 'lucide-react';
+import { CheckCircle, Phone, MessageCircle, Bell } from 'lucide-react';
 import { OnboardingData } from '../Onboarding';
 
 interface ThankYouStepProps {

@@ -64,7 +64,14 @@ const InterestsStep: React.FC<InterestsStepProps> = ({ data, updateData, onNext,
       setError(null);
       updateData({ interests: selectedInterests });
       const finalData = { ...data, interests: selectedInterests };
-      await saveOnboardingData(finalData);
+      const result = await saveOnboardingData(finalData);
+
+      if (result && result.profileId) {
+        localStorage.setItem('aasha_profile_id', result.profileId);
+        localStorage.setItem('aasha_phone_number', data.phoneNumber);
+        localStorage.setItem('aasha_country_code', data.countryCode);
+      }
+
       onNext();
     } catch (err: any) {
       console.error('Failed to save onboarding data:', err);
@@ -160,7 +167,14 @@ const InterestsStep: React.FC<InterestsStepProps> = ({ data, updateData, onNext,
                 setError(null);
                 updateData({ interests: [] });
                 const finalData = { ...data, interests: [] };
-                await saveOnboardingData(finalData);
+                const result = await saveOnboardingData(finalData);
+
+                if (result && result.profileId) {
+                  localStorage.setItem('aasha_profile_id', result.profileId);
+                  localStorage.setItem('aasha_phone_number', data.phoneNumber);
+                  localStorage.setItem('aasha_country_code', data.countryCode);
+                }
+
                 onNext();
               } catch (err: any) {
                 console.error('Failed to save onboarding data:', err);
