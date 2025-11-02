@@ -70,7 +70,6 @@ const InterestsSection: React.FC<InterestsSectionProps> = ({ elderlyProfile }) =
     try {
       await addInterest(elderlyProfile.id, interestId);
       await loadInterests();
-      setShowAddModal(false);
     } catch (error) {
       console.error('Error adding interest:', error);
       alert('Failed to add interest');
