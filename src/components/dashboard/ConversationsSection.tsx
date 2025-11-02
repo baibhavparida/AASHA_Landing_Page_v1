@@ -217,43 +217,44 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
           {filteredCalls.map((call) => {
             const analysis = call.call_analysis?.[0];
             const summary = analysis?.call_summary || call.call_transcripts?.[0]?.llm_call_summary || 'No summary available';
+            const callDate = new Date(call.created_at);
+            const dateStr = callDate.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+            });
+            const timeStr = callDate.toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true,
+            });
             return (
               <div
                 key={call.id}
-                className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-all cursor-pointer"
+                className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-all cursor-pointer border border-gray-100"
                 onClick={() => handleViewDetails(call)}
               >
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start flex-1">
-                    <div className="bg-[#F35E4A] bg-opacity-10 rounded-lg p-3 mr-4">
-                      <MessageCircle className="h-6 w-6 text-[#F35E4A]" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center mb-2">
-                        <h3 className="text-lg font-bold text-gray-900">
-                          {new Date(call.created_at).toLocaleDateString('en-US', {
-                            weekday: 'long',
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
-                        </h3>
-                        <span className="ml-3 flex items-center text-sm text-gray-600">
-                          <Clock className="h-4 w-4 mr-1" />
-                          {formatDuration(call.duration_seconds)}
-                        </span>
-                      </div>
-                      <p className="text-gray-600 line-clamp-2">{summary}</p>
+                <div className="flex items-start">
+                  <div className="bg-[#F35E4A] bg-opacity-10 rounded-lg p-3 mr-4 flex-shrink-0">
+                    <MessageCircle className="h-6 w-6 text-[#F35E4A]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base font-semibold text-gray-900 mb-1 line-clamp-2">
+                      {summary}
+                    </h3>
+                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                      <span>{dateStr}, {timeStr}</span>
+                      <span className="flex items-center">
+                        Duration: {formatDuration(call.duration_seconds)}
+                      </span>
                     </div>
                   </div>
-                  <ChevronRight className="h-6 w-6 text-gray-400 ml-4 flex-shrink-0" />
                 </div>
               </div>
             );
           })}
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+        <div className="bg-white rounded-xl shadow-sm p-12 text-center border border-gray-100">
           <MessageCircle className="h-24 w-24 text-gray-300 mx-auto mb-4" />
           <h3 className="text-2xl font-bold text-gray-900 mb-2">
             {searchQuery ? 'No Calls Found' : 'No Calls Yet'}
