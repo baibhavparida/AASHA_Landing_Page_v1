@@ -213,7 +213,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
 
       {/* Calls List */}
       {filteredCalls.length > 0 ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {filteredCalls.map((call) => {
             const analysis = call.call_analysis?.[0];
             const summary = analysis?.call_summary || call.call_transcripts?.[0]?.llm_call_summary || 'No summary available';
@@ -230,22 +230,20 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
             return (
               <div
                 key={call.id}
-                className="bg-white rounded-xl shadow-sm p-5 hover:shadow-md transition-all cursor-pointer border border-gray-100"
+                className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-all cursor-pointer"
                 onClick={() => handleViewDetails(call)}
               >
-                <div className="flex items-start">
-                  <div className="bg-[#F35E4A] bg-opacity-10 rounded-lg p-3 mr-4 flex-shrink-0">
-                    <MessageCircle className="h-6 w-6 text-[#F35E4A]" />
+                <div className="flex items-start gap-4">
+                  <div className="bg-[#FEF2F2] rounded-xl p-4 flex-shrink-0">
+                    <MessageCircle className="h-7 w-7 text-[#F35E4A]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-semibold text-gray-900 mb-1 line-clamp-2">
+                    <p className="text-base text-gray-900 mb-3 leading-relaxed">
                       {summary}
-                    </h3>
-                    <div className="flex items-center gap-3 text-sm text-gray-600">
+                    </p>
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
                       <span>{dateStr}, {timeStr}</span>
-                      <span className="flex items-center">
-                        Duration: {formatDuration(call.duration_seconds)}
-                      </span>
+                      <span>Duration: {formatDuration(call.duration_seconds)}</span>
                     </div>
                   </div>
                 </div>
