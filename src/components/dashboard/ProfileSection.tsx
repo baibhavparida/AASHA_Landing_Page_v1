@@ -71,31 +71,28 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ elderlyProfile, onUpdat
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Profile Header */}
-      <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-        <div className="bg-gradient-to-r from-[#F35E4A] to-[#e54d37] h-32"></div>
-        <div className="px-8 pb-8">
-          <div className="flex flex-col md:flex-row items-center md:items-end -mt-16 md:-mt-12">
-            <div className="h-32 w-32 rounded-full bg-white border-4 border-white shadow-lg flex items-center justify-center">
-              <User className="h-16 w-16 text-[#F35E4A]" />
-            </div>
-            <div className="mt-4 md:mt-0 md:ml-6 text-center md:text-left flex-1">
-              <h2 className="text-3xl font-bold text-gray-900">
-                {elderlyProfile.first_name} {elderlyProfile.last_name}
-              </h2>
-              <p className="text-lg text-gray-600 mt-1">
-                {calculateAge(elderlyProfile.date_of_birth)} years old
-              </p>
-            </div>
-            {!isEditing && (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="mt-4 md:mt-0 flex items-center bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all"
-              >
-                <Edit2 className="h-5 w-5 mr-2" />
-                Edit Profile
-              </button>
-            )}
+      <div className="bg-white rounded-2xl shadow-md p-8">
+        <div className="flex flex-col md:flex-row items-center md:items-start">
+          <div className="h-32 w-32 rounded-full bg-gray-100 shadow-lg flex items-center justify-center">
+            <User className="h-16 w-16 text-[#F35E4A]" />
           </div>
+          <div className="mt-4 md:mt-0 md:ml-6 text-center md:text-left flex-1">
+            <h2 className="text-3xl font-bold text-gray-900">
+              {elderlyProfile.first_name} {elderlyProfile.last_name}
+            </h2>
+            <p className="text-lg text-gray-600 mt-1">
+              {calculateAge(elderlyProfile.date_of_birth)} years old
+            </p>
+          </div>
+          {!isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="mt-4 md:mt-0 flex items-center bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all"
+            >
+              <Edit2 className="h-5 w-5 mr-2" />
+              Edit Profile
+            </button>
+          )}
         </div>
       </div>
 
