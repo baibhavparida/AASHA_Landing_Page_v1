@@ -259,19 +259,13 @@ const FamilyDashboard: React.FC = () => {
       </aside>
 
       <div className="flex-1 flex flex-col min-h-screen">
-        <header className="bg-white border-b border-gray-200 p-4 lg:p-6">
-          <div className="flex items-center">
-            <button
-              onClick={() => setIsSidebarOpen(true)}
-              className="lg:hidden text-gray-700 hover:text-[#F35E4A] mr-4"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
-            <h1 className="text-xl font-bold text-gray-900">
-              {menuItems.find((item) => item.id === currentSection)?.label || 'Family Dashboard'}
-            </h1>
-          </div>
-        </header>
+        {/* Mobile Menu Button - Fixed Position */}
+        <button
+          onClick={() => setIsSidebarOpen(true)}
+          className="lg:hidden fixed top-4 left-4 z-30 bg-white text-gray-700 hover:text-[#F35E4A] p-3 rounded-lg shadow-lg border border-gray-200"
+        >
+          <Menu className="h-6 w-6" />
+        </button>
 
         <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
           {renderSection()}
