@@ -388,7 +388,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
                       <h4 className="text-sm font-semibold text-gray-900 mb-1">
                         {callTitle}
                       </h4>
-                      <p className="text-sm text-gray-900 mb-2 leading-relaxed line-clamp-2">
+                      <p className="text-sm text-gray-900 mb-2 leading-relaxed line-clamp-1">
                         {summary}
                       </p>
                       <div className="flex items-center gap-3 text-xs text-gray-600">
