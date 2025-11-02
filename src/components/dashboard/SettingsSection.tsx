@@ -154,8 +154,8 @@ const SettingsSection: React.FC<SettingsSectionProps> = ({ elderlyProfile }) => 
             <Mail className="h-6 w-6 text-[#F35E4A] mr-4" />
             <div>
               <p className="font-semibold text-gray-900">Email Support</p>
-              <a href="mailto:hello@aasha.com" className="text-sm text-[#F35E4A] hover:underline">
-                hello@aasha.com
+              <a href="mailto:info@aasha.net" className="text-sm text-[#F35E4A] hover:underline">
+                info@aasha.net
               </a>
             </div>
           </div>

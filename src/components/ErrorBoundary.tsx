@@ -61,7 +61,7 @@ class ErrorBoundary extends React.Component<Props, State> {
               </button>
             </div>
             <p className="mt-6 text-sm text-gray-500">
-              If this problem persists, please contact support at hello@aasha.com
+              If this problem persists, please contact support at info@aasha.net
             </p>
           </div>
         </div>

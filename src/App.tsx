@@ -1076,7 +1076,7 @@ function App() {
               <div className="space-y-2 text-gray-600 flex flex-col items-center">
                 <div className="flex items-center justify-center">
                   <Mail className="h-4 w-4 mr-2 text-[#F35E4A]" />
-                  <span>hello@aasha.com</span>
+                  <span>info@aasha.net</span>
                 </div>
                 <div className="flex items-center justify-center">
                   <Phone className="h-4 w-4 mr-2 text-[#F35E4A]" />

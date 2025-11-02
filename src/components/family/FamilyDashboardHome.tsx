@@ -138,7 +138,7 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-[#F35E4A]">
+        <div className="bg-white rounded-xl shadow-md p-6 border-2 border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Medications</p>
@@ -148,9 +148,7 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
           </div>
         </div>
 
-        <div className={`bg-white rounded-xl shadow-md p-6 border-l-4 ${
-          stats.medicationAdherence >= 80 ? 'border-green-500' : 'border-orange-500'
-        }`}>
+        <div className="bg-white rounded-xl shadow-md p-6 border-2 border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Adherence Rate</p>
@@ -162,7 +160,7 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+        <div className="bg-white rounded-xl shadow-md p-6 border-2 border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Upcoming Events</p>
@@ -172,9 +170,7 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
           </div>
         </div>
 
-        <div className={`bg-white rounded-xl shadow-md p-6 border-l-4 ${
-          stats.unreadAlerts > 0 ? 'border-red-500' : 'border-green-500'
-        }`}>
+        <div className="bg-white rounded-xl shadow-md p-6 border-2 border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Active Alerts</p>
@@ -201,7 +197,7 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
         </div>
       )}
 
-      <div className="bg-white rounded-2xl shadow-md p-8">
+      <div className="bg-white rounded-2xl shadow-md p-8 border-2 border-gray-200">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center mb-4">
@@ -221,7 +217,7 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
       </div>
 
       {recentAlerts.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-md p-6">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-2 border-gray-200">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-gray-900">Recent Alerts</h3>
             <button
@@ -253,7 +249,7 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-2xl shadow-md p-6">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-2 border-gray-200">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-gray-900">Recent Activity</h3>
             <Activity className="h-6 w-6 text-gray-400" />
@@ -279,35 +275,35 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-6">
+        <div className="bg-white rounded-2xl shadow-md p-6 border-2 border-gray-200">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-xl font-bold text-gray-900">Quick Actions</h3>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <button
               onClick={() => onNavigate('content')}
-              className="p-4 border-2 border-[#F35E4A] text-[#F35E4A] rounded-lg hover:bg-[#F35E4A] hover:text-white transition-all"
+              className="p-4 border-2 border-gray-200 text-[#F35E4A] rounded-lg hover:bg-[#F35E4A] hover:text-white transition-all"
             >
               <Activity className="h-6 w-6 mx-auto mb-2" />
               <span className="text-sm font-semibold">Share Content</span>
             </button>
             <button
               onClick={() => onNavigate('medications')}
-              className="p-4 border-2 border-[#F35E4A] text-[#F35E4A] rounded-lg hover:bg-[#F35E4A] hover:text-white transition-all"
+              className="p-4 border-2 border-gray-200 text-[#F35E4A] rounded-lg hover:bg-[#F35E4A] hover:text-white transition-all"
             >
               <Pill className="h-6 w-6 mx-auto mb-2" />
               <span className="text-sm font-semibold">Manage Meds</span>
             </button>
             <button
               onClick={() => onNavigate('events')}
-              className="p-4 border-2 border-[#F35E4A] text-[#F35E4A] rounded-lg hover:bg-[#F35E4A] hover:text-white transition-all"
+              className="p-4 border-2 border-gray-200 text-[#F35E4A] rounded-lg hover:bg-[#F35E4A] hover:text-white transition-all"
             >
               <Calendar className="h-6 w-6 mx-auto mb-2" />
               <span className="text-sm font-semibold">Add Event</span>
             </button>
             <button
               onClick={() => onNavigate('profile')}
-              className="p-4 border-2 border-[#F35E4A] text-[#F35E4A] rounded-lg hover:bg-[#F35E4A] hover:text-white transition-all"
+              className="p-4 border-2 border-gray-200 text-[#F35E4A] rounded-lg hover:bg-[#F35E4A] hover:text-white transition-all"
             >
               <CheckCircle className="h-6 w-6 mx-auto mb-2" />
               <span className="text-sm font-semibold">View Profile</span>
