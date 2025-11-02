@@ -510,7 +510,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
                 return (
                   <div
                     key={interest.id}
-                    className="bg-white rounded-xl shadow-md p-4 border-2 border-[#F35E4A] hover:shadow-lg transition-all"
+                    className="bg-white rounded-xl shadow-md p-4 border-2 border-gray-200 hover:shadow-lg transition-all"
                   >
                     <div className="flex flex-col items-center text-center">
                       <div className="bg-[#F35E4A] bg-opacity-10 rounded-full p-3 mb-2">
