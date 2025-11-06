@@ -219,7 +219,9 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
         <div className="space-y-4">
           {filteredCalls.map((call) => {
             const analysis = call.call_analysis?.[0];
-            const summary = analysis?.call_summary || call.call_transcripts?.[0]?.llm_call_summary || 'No summary available';
+            const summary = (analysis?.call_summary && analysis.call_summary.trim().length > 0 ? analysis.call_summary : null) ||
+                          (call.call_transcripts?.[0]?.llm_call_summary && call.call_transcripts[0].llm_call_summary.trim().length > 0 ? call.call_transcripts[0].llm_call_summary : null) ||
+                          'No summary available';
             const callDate = new Date(call.created_at);
 
             const callTitle = callDate.toLocaleDateString('en-US', {
@@ -308,28 +310,35 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
             <div className="flex-1 overflow-y-auto p-6">
               <div className="space-y-6">
                 {/* Summary */}
-                {(selectedCall.call_analysis?.[0]?.call_summary || selectedCall.call_transcripts?.[0]?.llm_call_summary) && (
-                  <div>
-                    <h4 className="text-lg font-bold text-gray-900 mb-3">Call Summary</h4>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <p className="text-gray-700 leading-relaxed">
-                        {selectedCall.call_analysis?.[0]?.call_summary || selectedCall.call_transcripts?.[0]?.llm_call_summary}
-                      </p>
+                {(() => {
+                  const summaryText = (selectedCall.call_analysis?.[0]?.call_summary && selectedCall.call_analysis[0].call_summary.trim().length > 0 ? selectedCall.call_analysis[0].call_summary : null) ||
+                                    (selectedCall.call_transcripts?.[0]?.llm_call_summary && selectedCall.call_transcripts[0].llm_call_summary.trim().length > 0 ? selectedCall.call_transcripts[0].llm_call_summary : null);
+                  return summaryText ? (
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-900 mb-3">Call Summary</h4>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <p className="text-gray-700 leading-relaxed">
+                          {summaryText}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  ) : null;
+                })()}
 
                 {/* Full Transcript */}
-                {selectedCall.call_transcripts?.[0]?.transcript_text && (
-                  <div>
-                    <h4 className="text-lg font-bold text-gray-900 mb-3">Full Transcript</h4>
-                    <div className="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
-                      <pre className="text-gray-700 whitespace-pre-wrap leading-relaxed font-sans">
-                        {selectedCall.call_transcripts?.[0]?.transcript_text}
-                      </pre>
+                {(() => {
+                  const transcriptText = selectedCall.call_transcripts?.[0]?.transcript_text && selectedCall.call_transcripts[0].transcript_text.trim().length > 0 ? selectedCall.call_transcripts[0].transcript_text : null;
+                  return transcriptText ? (
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-900 mb-3">Full Transcript</h4>
+                      <div className="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
+                        <pre className="text-gray-700 whitespace-pre-wrap leading-relaxed font-sans">
+                          {transcriptText}
+                        </pre>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  ) : null;
+                })()}
               </div>
             </div>
 
