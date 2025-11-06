@@ -732,16 +732,8 @@ function App() {
                         Monitor frequency of chats
                       </li>
                       <li className="flex items-center">
-                        <Bell className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        Get notified if chats are skipped
-                      </li>
-                      <li className="flex items-center">
                         <MessageCircle className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
                         Add suggested prompts for engagement
-                      </li>
-                      <li className="flex items-center">
-                        <Heart className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        Encourage parent to chat more
                       </li>
                       <li className="flex items-center">
                         <Zap className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
