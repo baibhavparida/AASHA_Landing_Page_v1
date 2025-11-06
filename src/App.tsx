@@ -579,7 +579,7 @@ function App() {
                     <ul className="space-y-4 text-gray-700">
                       <li className="flex items-center">
                         <MessageCircle className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        Have daily chats in Hindi/vernacular
+                        Have daily chats in Hindi or English
                       </li>
                       <li className="flex items-center">
                         <Globe className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
@@ -590,8 +590,8 @@ function App() {
                         Share childhood memories
                       </li>
                       <li className="flex items-center">
-                        <Gamepad2 className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        Play trivia games with AI
+                        <MessageCircle className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
+                        Talk about your day to day experiences
                       </li>
                       <li className="flex items-center">
                         <Music className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
