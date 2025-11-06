@@ -629,7 +629,7 @@ function App() {
 
             {/* Health & Wellness Reminders */}
             <div>
-              <h3 className="text-2xl md:text-4xl font-bold text-gray-900 mb-12 text-center sticky top-16 bg-[#F4F2EE] py-4 z-10 -mx-4 px-4">Health & Wellness Reminders</h3>
+              <h3 className="text-2xl md:text-4xl font-bold text-gray-900 mb-12 text-center sticky top-16 bg-[#F4F2EE] py-4 z-10 -mx-4 px-4">Medicine Reminders & Tracking</h3>
               <div className="grid lg:grid-cols-2 gap-16 items-start">
                 <div className="lg:sticky lg:top-32">
                   <img 
@@ -646,7 +646,7 @@ function App() {
                     <ul className="space-y-4 text-gray-700">
                       <li className="flex items-center">
                         <Mic className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        Simple voice reminders for medicines & routines
+                        Simple reminders for medicines & routines
                       </li>
                       <li className="flex items-center">
                         <CheckCircle className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
@@ -659,10 +659,6 @@ function App() {
                       <li className="flex items-center">
                         <Clock className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
                         Daily encouragement for balance & rest
-                      </li>
-                      <li className="flex items-center">
-                        <Bell className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        Refill alerts before medicines run out
                       </li>
                     </ul>
                   </div>
@@ -687,10 +683,6 @@ function App() {
                       <li className="flex items-center">
                         <Users className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
                         <span>Adjust schedules with doctor's advice</span>
-                      </li>
-                      <li className="flex items-center">
-                        <Mic className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        <span>Send motivational voice notes to encourage parents</span>
                       </li>
                     </ol>
                   </div>
