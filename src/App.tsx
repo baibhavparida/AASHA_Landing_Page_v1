@@ -690,9 +690,9 @@ function App() {
               </div>
             </div>
 
-            {/* Daily Conversational Engagement */}
+            {/* Interest-based Engagement */}
             <div>
-              <h3 className="text-2xl md:text-4xl font-bold text-gray-900 mb-12 text-center sticky top-16 bg-[#F4F2EE] py-4 z-10 -mx-4 px-4">Daily Conversational Engagement</h3>
+              <h3 className="text-2xl md:text-4xl font-bold text-gray-900 mb-12 text-center sticky top-16 bg-[#F4F2EE] py-4 z-10 -mx-4 px-4">Interest-based Engagement</h3>
               <div className="grid lg:grid-cols-2 gap-16 items-start">
                 <div className="lg:sticky lg:top-32">
                   <img 
@@ -709,23 +709,15 @@ function App() {
                     <ul className="space-y-4 text-gray-700">
                       <li className="flex items-center">
                         <MessageCircle className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        Morning check-in chat
-                      </li>
-                      <li className="flex items-center">
-                        <Gamepad2 className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        Fun short quizzes
+                        Engaging chat conversations
                       </li>
                       <li className="flex items-center">
                         <Heart className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        Share daily reflections
+                        Get interest based chat messages
                       </li>
                       <li className="flex items-center">
-                        <Clock className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        Ask Aasha to recall yesterday's chat
-                      </li>
-                      <li className="flex items-center">
-                        <BookOpen className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        Practice speech with poems or stories
+                        <Mic className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
+                        Write or send audio over chats to talk with Aasha
                       </li>
                     </ul>
                   </div>
