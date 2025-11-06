@@ -621,10 +621,6 @@ function App() {
                         <Bell className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
                         Get alerts if elder hasn't chatted in days
                       </li>
-                      <li className="flex items-center">
-                        <Globe className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        Encourage elder to practice English with AI
-                      </li>
                     </ul>
                   </div>
                 </div>
@@ -785,51 +781,39 @@ function App() {
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden text-left shadow-sm hover:shadow-md transition-shadow">
-              <img 
-                src="https://i.postimg.cc/GhcyqfZx/AASHA-HIW-1.png" 
-                alt="Person speaking or typing on device" 
+              <img
+                src="https://i.postimg.cc/mDjbDm8T/AASHA-HIW-2.png"
+                alt="Personalization and customization"
                 className="w-full h-40 object-cover"
               />
               <div className="p-6">
                 <div className="text-sm font-medium text-red-600 mb-2">Step 1</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Speak or Type</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">Simply talk to Aasha using your voice or type your thoughts. No complicated setup required.</p>
-              </div>
-            </div>
-            <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden text-left shadow-sm hover:shadow-md transition-shadow">
-              <img 
-                src="https://i.postimg.cc/mDjbDm8T/AASHA-HIW-2.png" 
-                alt="Personalization and customization" 
-                className="w-full h-40 object-cover"
-              />
-              <div className="p-6">
-                <div className="text-sm font-medium text-red-600 mb-2">Step 2</div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Personalize</h3>
                 <p className="text-gray-600 text-sm leading-relaxed">Tell Aasha about your preferences, family, and interests to create a personalized experience.</p>
               </div>
             </div>
             <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden text-left shadow-sm hover:shadow-md transition-shadow">
-              <img 
-                src="https://i.postimg.cc/rmMVMBGh/AASHA-HIW-3.png" 
-                alt="People connecting and communicating" 
+              <img
+                src="https://i.postimg.cc/rmMVMBGh/AASHA-HIW-3.png"
+                alt="People connecting and communicating"
                 className="w-full h-40 object-cover"
               />
               <div className="p-6">
-                <div className="text-sm font-medium text-red-600 mb-2">Step 3</div>
+                <div className="text-sm font-medium text-red-600 mb-2">Step 2</div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Connect</h3>
                 <p className="text-gray-600 text-sm leading-relaxed">Enjoy meaningful conversations, listen to stories, get music recommendations, and emotional support.</p>
               </div>
             </div>
             <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden text-left shadow-sm hover:shadow-md transition-shadow">
-              <img 
-                src="https://i.postimg.cc/xdKjrfmJ/AASHA-HIW-4.png" 
-                alt="24/7 support and care" 
+              <img
+                src="https://i.postimg.cc/xdKjrfmJ/AASHA-HIW-4.png"
+                alt="24/7 support and care"
                 className="w-full h-40 object-cover"
               />
               <div className="p-6">
-                <div className="text-sm font-medium text-red-600 mb-2">Step 4</div>
+                <div className="text-sm font-medium text-red-600 mb-2">Step 3</div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Revisit Anytime</h3>
                 <p className="text-gray-600 text-sm leading-relaxed">Access your conversation history and continue building your relationship with Aasha.</p>
               </div>
