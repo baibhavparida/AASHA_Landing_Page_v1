@@ -8,21 +8,22 @@ type ActivityLog = Database['public']['Tables']['family_activity_log']['Row'];
 type ConversationPrompt = Database['public']['Tables']['conversation_prompts']['Row'];
 
 export async function getElderlyProfilesForFamily() {
-  // For demo purposes, use localStorage instead of auth
-  const profileId = localStorage.getItem('aasha_profile_id');
+  // Get authenticated user from Supabase Auth
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (!profileId) {
-    console.error('No profile ID in localStorage');
-    throw new Error('User not authenticated');
+  if (authError || !user) {
+    console.error('Authentication error:', authError);
+    throw new Error('User not authenticated. Please log in again.');
   }
 
-  console.log('Loading elderly profiles for family member:', profileId);
+  const userId = user.id;
+  console.log('Loading elderly profiles for family member:', userId);
 
   // Check if profile exists in profiles table
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('id, registration_type')
-    .eq('id', profileId)
+    .eq('id', userId)
     .maybeSingle();
 
   if (profileError) {
@@ -31,7 +32,7 @@ export async function getElderlyProfilesForFamily() {
   }
 
   if (!profile) {
-    console.error('Profile not found in profiles table for ID:', profileId);
+    console.error('Profile not found in profiles table for ID:', userId);
     throw new Error('Profile not found. Please complete registration.');
   }
 
@@ -41,7 +42,7 @@ export async function getElderlyProfilesForFamily() {
   const { data, error } = await supabase
     .from('elderly_profiles')
     .select('*')
-    .eq('caregiver_profile_id', profileId);
+    .eq('caregiver_profile_id', userId);
 
   if (error) {
     console.error('Error fetching elderly profiles:', error);
@@ -49,7 +50,7 @@ export async function getElderlyProfilesForFamily() {
   }
 
   if (!data || data.length === 0) {
-    console.error('No elderly profiles found for caregiver_profile_id:', profileId);
+    console.error('No elderly profiles found for caregiver_profile_id:', userId);
     throw new Error('Your profile setup is incomplete. Please complete the registration process.');
   }
 
@@ -58,18 +59,18 @@ export async function getElderlyProfilesForFamily() {
 }
 
 export async function getElderlyProfileForFamily(elderlyProfileId: string) {
-  // For demo purposes, use localStorage instead of auth
-  const profileId = localStorage.getItem('aasha_profile_id');
+  // Get authenticated user from Supabase Auth
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (!profileId) {
-    throw new Error('User not authenticated');
+  if (authError || !user) {
+    throw new Error('User not authenticated. Please log in again.');
   }
 
   const { data, error } = await supabase
     .from('elderly_profiles')
     .select('*')
     .eq('id', elderlyProfileId)
-    .eq('caregiver_profile_id', profileId)
+    .eq('caregiver_profile_id', user.id)
     .maybeSingle();
 
   if (error) {
@@ -81,18 +82,18 @@ export async function getElderlyProfileForFamily(elderlyProfileId: string) {
 }
 
 export async function getFamilyAlerts(elderlyProfileId: string, unacknowledgedOnly = false) {
-  // For demo purposes, use localStorage instead of auth
-  const profileId = localStorage.getItem('aasha_profile_id');
+  // Get authenticated user from Supabase Auth
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (!profileId) {
-    throw new Error('User not authenticated');
+  if (authError || !user) {
+    throw new Error('User not authenticated. Please log in again.');
   }
 
   let query = supabase
     .from('family_member_alerts')
     .select('*')
     .eq('elderly_profile_id', elderlyProfileId)
-    .eq('family_member_id', profileId)
+    .eq('family_member_id', user.id)
     .order('created_at', { ascending: false });
 
   if (unacknowledgedOnly) {

@@ -11,21 +11,22 @@ type SpecialEvent = Database['public']['Tables']['special_events']['Row'];
 type MedicationTracking = Database['public']['Tables']['medication_tracking']['Row'];
 
 export async function getElderlyProfileForUser() {
-  // For demo purposes, use localStorage instead of auth
-  const profileId = localStorage.getItem('aasha_profile_id');
+  // Get authenticated user from Supabase Auth
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (!profileId) {
-    console.error('No profile ID in localStorage');
-    throw new Error('User not authenticated');
+  if (authError || !user) {
+    console.error('Authentication error:', authError);
+    throw new Error('User not authenticated. Please log in again.');
   }
 
-  console.log('Loading elderly profile for user:', profileId);
+  const userId = user.id;
+  console.log('Loading elderly profile for authenticated user:', userId);
 
   // Check if profile exists in profiles table
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('id, registration_type')
-    .eq('id', profileId)
+    .eq('id', userId)
     .maybeSingle();
 
   if (profileError) {
@@ -35,7 +36,7 @@ export async function getElderlyProfileForUser() {
   }
 
   if (!profile) {
-    console.error('Profile not found in profiles table for ID:', profileId);
+    console.error('Profile not found in profiles table for ID:', userId);
     throw new Error('Profile not found. Please complete registration.');
   }
 
@@ -45,18 +46,18 @@ export async function getElderlyProfileForUser() {
   const { data, error } = await supabase
     .from('elderly_profiles')
     .select('*')
-    .eq('profile_id', profileId)
+    .eq('profile_id', userId)
     .maybeSingle();
 
   if (error) {
     console.error('Error fetching elderly profile:', error);
     console.error('Full error details:', JSON.stringify(error, null, 2));
-    console.error('Query details: profile_id =', profileId);
+    console.error('Query details: profile_id =', userId);
     throw new Error('Failed to load profile data. Please try again.');
   }
 
   if (!data) {
-    console.error('No elderly profile found for profile_id:', profileId);
+    console.error('No elderly profile found for profile_id:', userId);
     console.error('This means the query succeeded but returned no rows');
     throw new Error('Your profile setup is incomplete. Please complete the registration process.');
   }

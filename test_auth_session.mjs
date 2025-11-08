@@ -1,113 +1,103 @@
 import { createClient } from '@supabase/supabase-js';
+import * as dotenv from 'dotenv';
 
-const supabaseUrl = 'https://mfxxoldpdbwxqndebypl.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1meHhvbGRwZGJ3eHFuZGVieXBsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5NDAwNTUsImV4cCI6MjA3NTUxNjA1NX0.aKHYidOVeyhYoTwd06zVN2jhP5Mh8slwsxzAMPUnH6w';
+dotenv.config();
+
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function testAuthSession() {
-  console.log('Testing authentication session and data access...\n');
-  console.log('='.repeat(100));
+  console.log('=== Testing Authentication Flow ===\n');
+
+  const phoneNumber = '4086257375';
+  const email = `${phoneNumber}@aasha-temp.com`;
   
-  // Try to sign in as one of the existing users
-  const phoneNumber = '7816989750';
-  const email = phoneNumber + '@aasha-temp.com';
-  
-  // Generate the same password used in registration
+  // Generate password (same logic as in LoginModal)
   const hash = phoneNumber.split('').reduce((acc, char) => {
     return ((acc << 5) - acc) + char.charCodeAt(0);
   }, 0);
-  const password = 'aasha_' + Math.abs(hash) + '_' + phoneNumber.slice(-4) + '_temp_pw_2025';
-  
-  console.log('Attempting to sign in...');
-  console.log('Email:', email);
-  
-  const signInResult = await supabase.auth.signInWithPassword({
-    email: email,
-    password: password,
+  const password = `aasha_${Math.abs(hash)}_${phoneNumber.slice(-4)}_temp_pw_2025`;
+
+  console.log('Signing in with email:', email);
+
+  // Sign in
+  const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password,
   });
-  
-  if (signInResult.error) {
-    console.log('Sign in ERROR:', signInResult.error.message);
-    console.log('\nThis means users cannot log in properly!');
+
+  if (signInError) {
+    console.error('Sign in error:', signInError);
     return;
   }
-  
-  if (!signInResult.data.session) {
-    console.log('Sign in succeeded but NO SESSION created!');
-    return;
-  }
-  
-  console.log('Sign in SUCCESS!');
-  console.log('User ID:', signInResult.data.user.id);
-  console.log('Session exists:', !!signInResult.data.session);
-  console.log('\n' + '='.repeat(100));
-  
-  // Now try to fetch data with the authenticated session
-  console.log('\nTesting data access with authenticated session...\n');
-  
-  const profileId = signInResult.data.user.id;
-  
-  // Get elderly profile
-  const elderlyProfileResult = await supabase
+
+  console.log('✓ Sign in successful');
+  console.log('User ID:', authData.user.id);
+  console.log('Session exists:', !!authData.session);
+
+  // Now test fetching calls with the authenticated session
+  console.log('\n=== Testing Call Fetch with Authenticated Session ===\n');
+
+  // First get the elderly profile
+  const { data: profile } = await supabase
     .from('elderly_profiles')
-    .select('id, first_name, last_name')
-    .eq('profile_id', profileId)
+    .select('id')
+    .eq('profile_id', authData.user.id)
     .maybeSingle();
-  
-  console.log('ELDERLY PROFILE:');
-  if (elderlyProfileResult.error) {
-    console.log('  Error:', elderlyProfileResult.error.message);
-  } else if (elderlyProfileResult.data) {
-    console.log('  SUCCESS! Found:', elderlyProfileResult.data.first_name, elderlyProfileResult.data.last_name);
-    console.log('  ID:', elderlyProfileResult.data.id);
-    
-    // Try to get medications
-    const medsResult = await supabase
-      .from('medications')
-      .select('*')
-      .eq('elderly_profile_id', elderlyProfileResult.data.id);
-    
-    console.log('\nMEDICATIONS:');
-    if (medsResult.error) {
-      console.log('  Error:', medsResult.error.message);
-    } else {
-      console.log('  Count:', medsResult.data.length);
-      if (medsResult.data.length > 0) {
-        medsResult.data.forEach((med, i) => {
-          console.log('  ' + (i + 1) + '. ' + med.name);
-        });
-      }
-    }
-    
-    // Try to get interests
-    const interestsResult = await supabase
-      .from('interests')
-      .select('*')
-      .eq('elderly_profile_id', elderlyProfileResult.data.id);
-    
-    console.log('\nINTERESTS:');
-    if (interestsResult.error) {
-      console.log('  Error:', interestsResult.error.message);
-    } else {
-      console.log('  Count:', interestsResult.data.length);
-      if (interestsResult.data.length > 0) {
-        interestsResult.data.forEach((int, i) => {
-          console.log('  ' + (i + 1) + '. ' + int.interest);
-        });
-      }
-    }
-  } else {
-    console.log('  No elderly profile found for this user');
+
+  if (!profile) {
+    console.error('No elderly profile found');
+    return;
   }
-  
-  console.log('\n' + '='.repeat(100));
-  console.log('\nCONCLUSION:');
-  console.log('If you see data above, the auth + RLS is working correctly.');
-  console.log('If you see errors or no data, there is a problem with RLS policies or data was not saved.');
-  
-  // Sign out
+
+  console.log('Elderly Profile ID:', profile.id);
+
+  // Fetch calls (this should now work with RLS)
+  const { data: calls, error: callsError } = await supabase
+    .from('calls')
+    .select(`
+      id,
+      created_at,
+      duration_seconds,
+      call_status,
+      call_analysis(call_summary),
+      call_transcripts(llm_call_summary)
+    `)
+    .eq('elderly_profile_id', profile.id)
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  if (callsError) {
+    console.error('Error fetching calls:', callsError);
+    return;
+  }
+
+  console.log('\n✓ Calls fetched successfully!');
+  console.log('Number of calls:', calls ? calls.length : 0);
+
+  if (calls && calls.length > 0) {
+    console.log('\nCall Details:');
+    calls.forEach((call, i) => {
+      const d = new Date(call.created_at);
+      console.log(`\n${i + 1}. ${d.toLocaleDateString()} ${d.toLocaleTimeString()}`);
+      console.log(`   Duration: ${call.duration_seconds}s`);
+      console.log(`   Status: ${call.call_status}`);
+      if (call.call_analysis && call.call_analysis.length > 0) {
+        console.log(`   Summary: ${call.call_analysis[0].call_summary ? call.call_analysis[0].call_summary.substring(0, 80) + '...' : 'N/A'}`);
+      }
+      if (call.call_transcripts && call.call_transcripts.length > 0) {
+        console.log(`   LLM Summary: ${call.call_transcripts[0].llm_call_summary ? call.call_transcripts[0].llm_call_summary.substring(0, 80) + '...' : 'N/A'}`);
+      }
+    });
+  } else {
+    console.log('\nNo calls found (check RLS policies)');
+  }
+
+  // Clean up - sign out
   await supabase.auth.signOut();
+  console.log('\n✓ Signed out successfully');
 }
 
 testAuthSession().catch(console.error);
