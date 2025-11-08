@@ -30,7 +30,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
     } else {
       const filtered = calls.filter(
         (call) => {
-          const summary = call.call_analysis?.[0]?.call_summary || call.call_transcripts?.[0]?.llm_call_summary || '';
+          const summary = call.call_analysis?.[0]?.call_summary || call.llm_call_summary || '';
           const dateStr = call.created_at ? new Date(call.created_at).toLocaleDateString() : '';
           return summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
             dateStr.includes(searchQuery);
@@ -220,7 +220,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
           {filteredCalls.map((call) => {
             const analysis = call.call_analysis?.[0];
             const summary = (analysis?.call_summary && analysis.call_summary.trim().length > 0 ? analysis.call_summary : null) ||
-                          (call.call_transcripts?.[0]?.llm_call_summary && call.call_transcripts[0].llm_call_summary.trim().length > 0 ? call.call_transcripts[0].llm_call_summary : null) ||
+                          (call.llm_call_summary && call.llm_call_summary.trim().length > 0 ? call.llm_call_summary : null) ||
                           'No summary available';
             const callDate = new Date(call.created_at);
 
@@ -312,7 +312,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
                 {/* Summary */}
                 {(() => {
                   const summaryText = (selectedCall.call_analysis?.[0]?.call_summary && selectedCall.call_analysis[0].call_summary.trim().length > 0 ? selectedCall.call_analysis[0].call_summary : null) ||
-                                    (selectedCall.call_transcripts?.[0]?.llm_call_summary && selectedCall.call_transcripts[0].llm_call_summary.trim().length > 0 ? selectedCall.call_transcripts[0].llm_call_summary : null);
+                                    (selectedCall.llm_call_summary && selectedCall.llm_call_summary.trim().length > 0 ? selectedCall.llm_call_summary : null);
                   return summaryText ? (
                     <div>
                       <h4 className="text-lg font-bold text-gray-900 mb-3">Call Summary</h4>

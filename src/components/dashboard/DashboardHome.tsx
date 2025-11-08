@@ -354,7 +354,7 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
         {recentCalls.length > 0 ? (
           <div className="space-y-3">
             {recentCalls.map((call) => {
-              const summary = call.call_analysis?.[0]?.call_summary || call.call_transcripts?.[0]?.llm_call_summary || 'No summary available';
+              const summary = call.call_analysis?.[0]?.call_summary || call.llm_call_summary || 'No summary available';
               const formatDuration = (seconds: number) => {
                 const minutes = Math.floor(seconds / 60);
                 const secs = seconds % 60;

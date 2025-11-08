@@ -276,7 +276,7 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
           {recentCalls.length > 0 ? (
             <div className="space-y-3">
               {recentCalls.map((call) => {
-                const summary = call.call_analysis?.[0]?.call_summary || call.call_transcripts?.[0]?.llm_call_summary || 'No summary available';
+                const summary = call.call_analysis?.[0]?.call_summary || call.llm_call_summary || 'No summary available';
                 const formatDuration = (seconds: number) => {
                   const minutes = Math.floor(seconds / 60);
                   const secs = seconds % 60;
@@ -497,12 +497,12 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
             <div className="flex-1 overflow-y-auto p-6">
               <div className="space-y-6">
                 {/* Summary */}
-                {(selectedCall.call_analysis?.[0]?.call_summary || selectedCall.call_transcripts?.[0]?.llm_call_summary) && (
+                {(selectedCall.call_analysis?.[0]?.call_summary || selectedCall.llm_call_summary) && (
                   <div>
                     <h4 className="text-lg font-bold text-gray-900 mb-3">Call Summary</h4>
                     <div className="bg-gray-50 rounded-lg p-4">
                       <p className="text-gray-700 leading-relaxed">
-                        {selectedCall.call_analysis?.[0]?.call_summary || selectedCall.call_transcripts?.[0]?.llm_call_summary}
+                        {selectedCall.call_analysis?.[0]?.call_summary || selectedCall.llm_call_summary}
                       </p>
                     </div>
                   </div>
