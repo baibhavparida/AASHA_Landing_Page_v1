@@ -38,6 +38,7 @@ import {
 import { getMedications, getCalls, getSpecialEvents, getInterests } from '../../services/dashboardService';
 import { getFamilyAlerts, getMedicationAdherenceStats } from '../../services/familyDashboardService';
 import { getDailyMedicineLogs } from '../../services/dailyMedicineLogService';
+import SentimentIndicator from '../common/SentimentIndicator';
 
 interface FamilyDashboardHomeProps {
   elderlyProfile: {
@@ -296,6 +297,8 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
                   minute: '2-digit',
                   hour12: true,
                 });
+                const sentiment = call.call_analysis?.[0]?.user_sentiment;
+
                 return (
                   <div
                     key={call.id}
@@ -307,9 +310,12 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
                         <MessageCircle className="h-5 w-5 text-[#F35E4A]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-semibold text-gray-900 mb-1">
-                          {callTitle}
-                        </h4>
+                        <div className="flex items-center justify-between mb-1">
+                          <h4 className="text-sm font-semibold text-gray-900">
+                            {callTitle}
+                          </h4>
+                          <SentimentIndicator sentiment={sentiment} size="small" showLabel={false} />
+                        </div>
                         <p className="text-sm text-gray-900 mb-2 leading-relaxed line-clamp-1">
                           {summary}
                         </p>
@@ -462,7 +468,7 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
             {/* Header */}
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-start justify-between">
-                <div>
+                <div className="flex-1">
                   <h3 className="text-2xl font-bold text-gray-900">
                     {new Date(selectedCall.created_at).toLocaleDateString('en-US', {
                       weekday: 'long',
@@ -471,18 +477,24 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
                       day: 'numeric',
                     })}
                   </h3>
-                  <p className="text-gray-600 mt-1 flex items-center">
-                    <Clock className="h-4 w-4 mr-1" />
-                    Duration: {(() => {
-                      const seconds = selectedCall.duration_seconds;
-                      const minutes = Math.floor(seconds / 60);
-                      const secs = seconds % 60;
-                      if (minutes < 60) return `${minutes}:${secs.toString().padStart(2, '0')}`;
-                      const hours = Math.floor(minutes / 60);
-                      const mins = minutes % 60;
-                      return `${hours}h ${mins}m`;
-                    })()}
-                  </p>
+                  <div className="flex items-center gap-4 mt-2">
+                    <p className="text-gray-600 flex items-center">
+                      <Clock className="h-4 w-4 mr-1" />
+                      Duration: {(() => {
+                        const seconds = selectedCall.duration_seconds;
+                        const minutes = Math.floor(seconds / 60);
+                        const secs = seconds % 60;
+                        if (minutes < 60) return `${minutes}:${secs.toString().padStart(2, '0')}`;
+                        const hours = Math.floor(minutes / 60);
+                        const mins = minutes % 60;
+                        return `${hours}h ${mins}m`;
+                      })()}
+                    </p>
+                    <SentimentIndicator
+                      sentiment={selectedCall.call_analysis?.[0]?.user_sentiment}
+                      size="medium"
+                    />
+                  </div>
                 </div>
                 <button
                   onClick={() => setSelectedCall(null)}

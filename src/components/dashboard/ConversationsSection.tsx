@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, Clock, Search, ChevronRight, X, FileText, Sun, Moon, Save } from 'lucide-react';
 import { getCalls, getCall, updateElderlyProfile } from '../../services/dashboardService';
+import SentimentIndicator from '../common/SentimentIndicator';
 
 interface ConversationsSectionProps {
   elderlyProfile: {
@@ -235,6 +236,8 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
               hour12: true,
             });
 
+            const sentiment = call.call_analysis?.[0]?.user_sentiment;
+
             return (
               <div
                 key={call.id}
@@ -246,9 +249,12 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
                     <MessageCircle className="h-7 w-7 text-[#F35E4A]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-semibold text-gray-900 mb-2">
-                      {callTitle}
-                    </h3>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-base font-semibold text-gray-900">
+                        {callTitle}
+                      </h3>
+                      <SentimentIndicator sentiment={sentiment} size="small" />
+                    </div>
                     <p className="text-base text-gray-900 mb-3 leading-relaxed">
                       {summary}
                     </p>
@@ -283,7 +289,7 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
             {/* Header */}
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-start justify-between">
-                <div>
+                <div className="flex-1">
                   <h3 className="text-2xl font-bold text-gray-900">
                     {new Date(selectedCall.created_at).toLocaleDateString('en-US', {
                       weekday: 'long',
@@ -292,10 +298,16 @@ const ConversationsSection: React.FC<ConversationsSectionProps> = ({ elderlyProf
                       day: 'numeric',
                     })}
                   </h3>
-                  <p className="text-gray-600 mt-1 flex items-center">
-                    <Clock className="h-4 w-4 mr-1" />
-                    Duration: {formatDuration(selectedCall.duration_seconds)}
-                  </p>
+                  <div className="flex items-center gap-4 mt-2">
+                    <p className="text-gray-600 flex items-center">
+                      <Clock className="h-4 w-4 mr-1" />
+                      Duration: {formatDuration(selectedCall.duration_seconds)}
+                    </p>
+                    <SentimentIndicator
+                      sentiment={selectedCall.call_analysis?.[0]?.user_sentiment}
+                      size="medium"
+                    />
+                  </div>
                 </div>
                 <button
                   onClick={handleCloseDetails}
