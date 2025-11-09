@@ -337,8 +337,13 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
         {/* Stats Row - Vertical Stack */}
         <div className="space-y-3">
           <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-sm text-gray-600 mb-1">Adherence Rate</p>
-            <p className="text-2xl font-bold text-gray-900">{getAdherenceRate()}%</p>
+            <p className="text-sm text-gray-600 mb-1">Medication Taken</p>
+            <p className="text-2xl font-bold text-gray-900">
+              {(() => {
+                const takenDays = weeklyLogs.filter(log => log.medicine_taken).length;
+                return `${takenDays} out of 7 days`;
+              })()}
+            </p>
           </div>
           <div className="bg-gray-50 rounded-lg p-3">
             <p className="text-sm text-gray-600 mb-1">Total Medications</p>
