@@ -155,12 +155,25 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
     <div className="space-y-8">
       {/* Welcome Section */}
       <div className="bg-white rounded-2xl shadow-md p-8 border-2 border-gray-200">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
-          {getGreeting()}!
-        </h2>
-        <p className="text-lg text-gray-600">
-          Here's how {elderlyProfile.first_name} is doing today.
-        </p>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              {getGreeting()}!
+            </h2>
+            <p className="text-lg text-gray-600">
+              Here's how {elderlyProfile.first_name} is doing today.
+            </p>
+          </div>
+          {recentCalls.length > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Latest mood:</span>
+              <SentimentIndicator
+                sentiment={recentCalls[0]?.call_analysis?.[0]?.user_sentiment}
+                size="medium"
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Two Column Layout - Medication and Conversations */}

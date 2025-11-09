@@ -211,23 +211,34 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
               Preferred call window: {getCallTimeDisplay()}
             </p>
           </div>
-          <button
-            onClick={handleTalkToAasha}
-            disabled={initiatingCall}
-            className="flex items-center justify-center space-x-2 bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-          >
-            {initiatingCall ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                <span>Calling...</span>
-              </>
-            ) : (
-              <>
-                <Phone className="h-5 w-5" />
-                <span>Talk to Aasha</span>
-              </>
+          <div className="flex flex-col items-center gap-3">
+            {recentCalls.length > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Latest mood:</span>
+                <SentimentIndicator
+                  sentiment={recentCalls[0]?.call_analysis?.[0]?.user_sentiment}
+                  size="medium"
+                />
+              </div>
             )}
-          </button>
+            <button
+              onClick={handleTalkToAasha}
+              disabled={initiatingCall}
+              className="flex items-center justify-center space-x-2 bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            >
+              {initiatingCall ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>Calling...</span>
+                </>
+              ) : (
+                <>
+                  <Phone className="h-5 w-5" />
+                  <span>Talk to Aasha</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
         {callSuccess && (
           <div className="mt-4 bg-green-50 border-l-4 border-green-500 rounded p-4">

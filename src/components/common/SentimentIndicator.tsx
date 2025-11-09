@@ -14,9 +14,7 @@ const SentimentIndicator: React.FC<SentimentIndicatorProps> = ({
   size = 'small',
   showLabel = true
 }) => {
-  if (!sentiment) {
-    return null;
-  }
+  const displaySentiment = sentiment || 'Neutral';
 
   const sizeClasses = {
     small: 'h-4 w-4',
@@ -37,7 +35,7 @@ const SentimentIndicator: React.FC<SentimentIndicatorProps> = ({
   };
 
   const getSentimentConfig = () => {
-    switch (sentiment) {
+    switch (displaySentiment) {
       case 'Positive':
         return {
           icon: Smile,
@@ -49,9 +47,9 @@ const SentimentIndicator: React.FC<SentimentIndicatorProps> = ({
       case 'Neutral':
         return {
           icon: Meh,
-          bgColor: 'bg-yellow-100',
-          iconColor: 'text-yellow-600',
-          textColor: 'text-yellow-700',
+          bgColor: 'bg-gray-100',
+          iconColor: 'text-gray-600',
+          textColor: 'text-gray-700',
           label: 'Neutral',
         };
       case 'Negative':
@@ -63,15 +61,17 @@ const SentimentIndicator: React.FC<SentimentIndicatorProps> = ({
           label: 'Negative',
         };
       default:
-        return null;
+        return {
+          icon: Meh,
+          bgColor: 'bg-gray-100',
+          iconColor: 'text-gray-600',
+          textColor: 'text-gray-700',
+          label: 'Neutral',
+        };
     }
   };
 
   const config = getSentimentConfig();
-
-  if (!config) {
-    return null;
-  }
 
   const Icon = config.icon;
 
