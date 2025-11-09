@@ -261,7 +261,12 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
           {/* Stats Row - Vertical Stack */}
           <div className="space-y-3">
             <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-sm text-gray-600 mb-1">Adherence Rate</p>
+              <p className="text-sm text-gray-600 mb-1">
+                {(() => {
+                  const takenDays = weeklyLogs.filter(log => log.medicine_taken).length;
+                  return `${takenDays} ${takenDays === 1 ? 'day' : 'days'} medication taken successfully in the last 7 days`;
+                })()}
+              </p>
               <p className="text-2xl font-bold text-gray-900">{getAdherenceRate()}%</p>
             </div>
             <div className="bg-gray-50 rounded-lg p-3">
