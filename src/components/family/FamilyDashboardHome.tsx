@@ -315,7 +315,7 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
                 return (
                   <div
                     key={call.id}
-                    className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-all cursor-pointer"
+                    className="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer"
                     onClick={() => setSelectedCall(call)}
                   >
                     <div className="flex items-start gap-3">
