@@ -306,16 +306,13 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
                     onClick={() => setSelectedCall(call)}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="bg-[#FEF2F2] rounded-lg p-2.5 flex-shrink-0">
-                        <MessageCircle className="h-5 w-5 text-[#F35E4A]" />
+                      <div className="flex-shrink-0">
+                        <SentimentIndicator sentiment={sentiment} size="large" showLabel={false} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <h4 className="text-sm font-semibold text-gray-900">
-                            {callTitle}
-                          </h4>
-                          <SentimentIndicator sentiment={sentiment} size="small" showLabel={false} />
-                        </div>
+                        <h4 className="text-sm font-semibold text-gray-900 mb-1">
+                          {callTitle}
+                        </h4>
                         <p className="text-sm text-gray-900 mb-2 leading-relaxed line-clamp-1">
                           {summary}
                         </p>
