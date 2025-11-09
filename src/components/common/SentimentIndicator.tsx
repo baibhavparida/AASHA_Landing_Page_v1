@@ -55,9 +55,9 @@ const SentimentIndicator: React.FC<SentimentIndicatorProps> = ({
       case 'Negative':
         return {
           icon: Frown,
-          bgColor: 'bg-red-100',
-          iconColor: 'text-red-600',
-          textColor: 'text-red-700',
+          bgColor: 'bg-amber-50',
+          iconColor: 'text-amber-700',
+          textColor: 'text-amber-800',
           label: 'Negative',
         };
       default:
