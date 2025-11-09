@@ -334,21 +334,32 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
           })}
         </div>
 
-        {/* Stats Row - Vertical Stack */}
-        <div className="space-y-3">
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-sm text-gray-600 mb-1">Medication Taken</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {(() => {
-                const takenDays = weeklyLogs.filter(log => log.medicine_taken).length;
-                return `${takenDays} out of 7 days`;
-              })()}
+        {/* Stats Row - Three Column Grid */}
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+            <p className="text-xs text-green-700 mb-1 font-semibold">Taken</p>
+            <p className="text-xl font-bold text-green-700">
+              {weeklyLogs.filter(log => log.medicine_taken).length}
             </p>
           </div>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-sm text-gray-600 mb-1">Total Medications</p>
-            <p className="text-2xl font-bold text-gray-900">{medications.length}</p>
+          <div className="bg-red-50 rounded-lg p-3 border border-red-200">
+            <p className="text-xs text-red-700 mb-1 font-semibold">Missed</p>
+            <p className="text-xl font-bold text-red-700">
+              {weeklyLogs.filter(log => !log.medicine_taken).length}
+            </p>
           </div>
+          <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+            <p className="text-xs text-gray-700 mb-1 font-semibold">Not Tracked</p>
+            <p className="text-xl font-bold text-gray-700">
+              {7 - weeklyLogs.length}
+            </p>
+          </div>
+        </div>
+
+        {/* Total Medications */}
+        <div className="bg-gray-50 rounded-lg p-3 mt-3">
+          <p className="text-sm text-gray-600 mb-1">Total Medications</p>
+          <p className="text-2xl font-bold text-gray-900">{medications.length}</p>
         </div>
         </div>
 
