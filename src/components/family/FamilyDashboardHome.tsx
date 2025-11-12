@@ -33,11 +33,14 @@ import {
   Film,
   GraduationCap,
   Theater,
-  Sparkles
+  Sparkles,
+  Phone,
+  Loader2
 } from 'lucide-react';
 import { getMedications, getCalls, getSpecialEvents, getInterests } from '../../services/dashboardService';
 import { getFamilyAlerts, getMedicationAdherenceStats } from '../../services/familyDashboardService';
 import { getDailyMedicineLogs } from '../../services/dailyMedicineLogService';
+import { supabase } from '../../lib/supabase';
 import SentimentIndicator from '../common/SentimentIndicator';
 
 interface FamilyDashboardHomeProps {
@@ -61,6 +64,9 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
   const [loading, setLoading] = useState(true);
   const [selectedWeekOffset, setSelectedWeekOffset] = useState(0);
   const [selectedCall, setSelectedCall] = useState<any>(null);
+  const [initiatingCall, setInitiatingCall] = useState(false);
+  const [callError, setCallError] = useState<string | null>(null);
+  const [callSuccess, setCallSuccess] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -143,6 +149,53 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
     return `${selectedWeekOffset} Weeks Ago`;
   };
 
+  const handleTalkToAasha = async () => {
+    try {
+      setInitiatingCall(true);
+      setCallError(null);
+      setCallSuccess(false);
+
+      // Fetch comprehensive user data from the database
+      const { data: fullProfileData, error: dbError } = await supabase
+        .rpc('get_elderly_profile_full_details', {
+          p_elderly_profile_id: elderlyProfile.id
+        });
+
+      if (dbError) {
+        console.error('Error fetching profile data:', dbError);
+        throw new Error('Failed to fetch user data');
+      }
+
+      // Send all available data to the webhook
+      const response = await fetch('https://sunitaai.app.n8n.cloud/webhook/Initiate_routine_call', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          elderly_profile_id: elderlyProfile.id,
+          first_name: elderlyProfile.first_name,
+          last_name: elderlyProfile.last_name,
+          call_time_preference: elderlyProfile.call_time_preference,
+          profile_data: fullProfileData || {},
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to initiate call');
+      }
+
+      setCallSuccess(true);
+      setTimeout(() => setCallSuccess(false), 5000);
+    } catch (error) {
+      console.error('Error initiating call:', error);
+      setCallError('Failed to initiate call. Please try again.');
+      setTimeout(() => setCallError(null), 5000);
+    } finally {
+      setInitiatingCall(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -163,17 +216,49 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
             <p className="text-lg text-gray-600">
               Here's how {elderlyProfile.first_name} is doing today.
             </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Preferred call window: {getCallTimeDisplay()}
+            </p>
           </div>
-          {recentCalls.length > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Latest mood:</span>
-              <SentimentIndicator
-                sentiment={recentCalls[0]?.call_analysis?.[0]?.user_sentiment}
-                size="medium"
-              />
-            </div>
-          )}
+          <div className="flex flex-col items-center gap-3">
+            {recentCalls.length > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Latest mood:</span>
+                <SentimentIndicator
+                  sentiment={recentCalls[0]?.call_analysis?.[0]?.user_sentiment}
+                  size="medium"
+                />
+              </div>
+            )}
+            <button
+              onClick={handleTalkToAasha}
+              disabled={initiatingCall}
+              className="flex items-center justify-center space-x-2 bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            >
+              {initiatingCall ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>Calling...</span>
+                </>
+              ) : (
+                <>
+                  <Phone className="h-5 w-5" />
+                  <span>Get a Call from Aasha</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
+        {callSuccess && (
+          <div className="mt-4 bg-green-50 border-l-4 border-green-500 rounded p-4">
+            <p className="text-green-800 font-semibold">Call initiated! Aasha will call {elderlyProfile.first_name} shortly.</p>
+          </div>
+        )}
+        {callError && (
+          <div className="mt-4 bg-red-50 border-l-4 border-red-500 rounded p-4">
+            <p className="text-red-800 font-semibold">{callError}</p>
+          </div>
+        )}
       </div>
 
       {/* Two Column Layout - Medication and Conversations */}
