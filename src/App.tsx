@@ -560,9 +560,9 @@ function App() {
           </div>
 
           <div className="space-y-20">
-            {/* Natural AI Conversations */}
+            {/* Natural Family-like Conversations */}
             <div>
-              <h3 className="text-2xl md:text-4xl font-bold text-gray-900 mb-12 text-center sticky top-16 bg-[#F4F2EE] py-4 z-10 -mx-4 px-4">Natural AI Conversations</h3>
+              <h3 className="text-2xl md:text-4xl font-bold text-gray-900 mb-12 text-center sticky top-16 bg-[#F4F2EE] py-4 z-10 -mx-4 px-4">Natural Family-like Conversations</h3>
               <div className="grid lg:grid-cols-2 gap-16 items-start">
                 <div className="lg:sticky lg:top-32">
                   <img 
