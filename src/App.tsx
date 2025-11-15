@@ -617,10 +617,6 @@ function App() {
                         <Heart className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
                         Upload family news for Aasha to mention
                       </li>
-                      <li className="flex items-center">
-                        <Bell className="h-5 w-5 text-[#F35E4A] mr-3 flex-shrink-0" />
-                        Get alerts if elder hasn't chatted in days
-                      </li>
                     </ul>
                   </div>
                 </div>
