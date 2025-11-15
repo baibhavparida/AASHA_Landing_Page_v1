@@ -126,25 +126,6 @@ const InterestsStep: React.FC<InterestsStepProps> = ({ data, updateData, onNext,
         })}
       </div>
 
-      {selectedInterests.length > 0 && (
-        <div className="bg-white rounded-2xl p-6 border-2 border-gray-200 mb-8">
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">Selected interests:</h3>
-          <div className="flex flex-wrap gap-3">
-            {selectedInterests.map((id) => {
-              const interest = interests.find((i) => i.id === id);
-              return (
-                <span
-                  key={id}
-                  className="px-4 py-2 bg-[#F35E4A] text-white rounded-full text-sm font-semibold"
-                >
-                  {interest?.label}
-                </span>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
       {error && (
         <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 mb-6">
           <p className="text-red-700 font-semibold">{error}</p>

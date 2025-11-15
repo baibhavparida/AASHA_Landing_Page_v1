@@ -29,14 +29,14 @@ const ThankYouStep: React.FC<ThankYouStepProps> = ({ data, onClose }) => {
         }
       </p>
 
-      <div className="bg-gradient-to-br from-[#F35E4A] to-[#e54d37] rounded-2xl p-8 mb-8 text-white">
+      <div className="bg-[#FEF8F3] rounded-2xl p-8 mb-8 border-2 border-[#F5E6D8]">
         <div className="flex items-center justify-center space-x-3 mb-4">
-          <Phone className="h-8 w-8" />
-          <h3 className="text-2xl font-bold">
+          <Phone className="h-8 w-8 text-[#F35E4A]" />
+          <h3 className="text-2xl font-bold text-gray-900">
             {isElderlyUser ? 'You will receive a call from Aasha within the next 2 mins!' : `${lovedOneName} will receive a call from Aasha within the next 2 mins!`}
           </h3>
         </div>
-        <p className="text-lg text-white/90">
+        <p className="text-lg text-gray-700">
           Please keep your phone nearby and answer when Aasha calls.
         </p>
       </div>
