@@ -38,7 +38,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { getMedications, getCalls, getSpecialEvents, getInterests } from '../../services/dashboardService';
-import { getFamilyAlerts, getMedicationAdherenceStats } from '../../services/familyDashboardService';
+import { getMedicationAdherenceStats } from '../../services/familyDashboardService';
 import { getDailyMedicineLogs } from '../../services/dailyMedicineLogService';
 import { supabase } from '../../lib/supabase';
 import SentimentIndicator from '../common/SentimentIndicator';
@@ -51,16 +51,14 @@ interface FamilyDashboardHomeProps {
     call_time_preference: string;
   };
   onNavigate: (section: string) => void;
-  setUnreadAlertsCount: (count: number) => void;
 }
 
-const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfile, onNavigate, setUnreadAlertsCount }) => {
+const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfile, onNavigate }) => {
   const [medications, setMedications] = useState<any[]>([]);
   const [recentCalls, setRecentCalls] = useState<any[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [interests, setInterests] = useState<any[]>([]);
   const [weeklyLogs, setWeeklyLogs] = useState<any[]>([]);
-  const [recentAlerts, setRecentAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedWeekOffset, setSelectedWeekOffset] = useState(0);
   const [selectedCall, setSelectedCall] = useState<any>(null);
@@ -81,13 +79,12 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
       const weekStart = new Date(weekEnd);
       weekStart.setDate(weekEnd.getDate() - 6);
 
-      const [medsData, callsData, eventsData, interestsData, logsData, alerts, adherenceStats] = await Promise.all([
+      const [medsData, callsData, eventsData, interestsData, logsData, adherenceStats] = await Promise.all([
         getMedications(elderlyProfile.id),
         getCalls(elderlyProfile.id, 10),
         getSpecialEvents(elderlyProfile.id),
         getInterests(elderlyProfile.id),
         getDailyMedicineLogs(elderlyProfile.id, weekStart, weekEnd),
-        getFamilyAlerts(elderlyProfile.id, true),
         getMedicationAdherenceStats(elderlyProfile.id, 30),
       ]);
 
@@ -101,8 +98,6 @@ const FamilyDashboardHome: React.FC<FamilyDashboardHomeProps> = ({ elderlyProfil
       setUpcomingEvents(upcoming.slice(0, 3));
       setInterests(interestsData);
       setWeeklyLogs(logsData);
-      setRecentAlerts(alerts.slice(0, 3));
-      setUnreadAlertsCount(alerts.length);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {

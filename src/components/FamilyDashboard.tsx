@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   User,
-  Bell,
-  Clock,
   MessageCircle,
   Heart,
   Calendar,
@@ -11,8 +9,6 @@ import {
   Menu,
   X,
   LogOut,
-  Upload,
-  Activity,
   Pill
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
@@ -24,11 +20,9 @@ import FamilyCallSchedule from './family/FamilyCallSchedule';
 import FamilyConversationsSection from './family/FamilyConversationsSection';
 import FamilyInterestsSection from './family/FamilyInterestsSection';
 import FamilyEventsSection from './family/FamilyEventsSection';
-import FamilyContentUpload from './family/FamilyContentUpload';
-import FamilyAlertsSection from './family/FamilyAlertsSection';
 import FamilySettingsSection from './family/FamilySettingsSection';
 
-type Section = 'home' | 'profile' | 'medications' | 'conversations' | 'interests' | 'events' | 'content' | 'alerts' | 'settings';
+type Section = 'home' | 'profile' | 'medications' | 'conversations' | 'interests' | 'events' | 'settings';
 
 interface ElderlyProfile {
   id: string;
@@ -49,7 +43,6 @@ const FamilyDashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [elderlyProfile, setElderlyProfile] = useState<ElderlyProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [unreadAlertsCount, setUnreadAlertsCount] = useState(0);
 
   useEffect(() => {
     loadProfile();
@@ -86,8 +79,6 @@ const FamilyDashboard: React.FC = () => {
     { id: 'conversations', label: 'Conversations', icon: MessageCircle },
     { id: 'interests', label: 'Interests & Topics', icon: Heart },
     { id: 'events', label: 'Special Events', icon: Calendar },
-    { id: 'content', label: 'Share Content', icon: Upload },
-    { id: 'alerts', label: 'Alerts', icon: Bell, badge: unreadAlertsCount },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
@@ -101,7 +92,7 @@ const FamilyDashboard: React.FC = () => {
 
     switch (currentSection) {
       case 'home':
-        return <FamilyDashboardHome elderlyProfile={elderlyProfile} onNavigate={handleSectionChange} setUnreadAlertsCount={setUnreadAlertsCount} />;
+        return <FamilyDashboardHome elderlyProfile={elderlyProfile} onNavigate={handleSectionChange} />;
       case 'profile':
         return <ElderlyProfileOverview elderlyProfile={elderlyProfile} onUpdate={loadProfile} />;
       case 'medications':
@@ -112,14 +103,10 @@ const FamilyDashboard: React.FC = () => {
         return <FamilyInterestsSection elderlyProfile={elderlyProfile} />;
       case 'events':
         return <FamilyEventsSection elderlyProfile={elderlyProfile} />;
-      case 'content':
-        return <FamilyContentUpload elderlyProfile={elderlyProfile} />;
-      case 'alerts':
-        return <FamilyAlertsSection elderlyProfile={elderlyProfile} setUnreadAlertsCount={setUnreadAlertsCount} />;
       case 'settings':
         return <FamilySettingsSection elderlyProfile={elderlyProfile} />;
       default:
-        return <FamilyDashboardHome elderlyProfile={elderlyProfile} onNavigate={handleSectionChange} setUnreadAlertsCount={setUnreadAlertsCount} />;
+        return <FamilyDashboardHome elderlyProfile={elderlyProfile} onNavigate={handleSectionChange} />;
     }
   };
 
@@ -229,13 +216,6 @@ const FamilyDashboard: React.FC = () => {
                         <Icon className="h-6 w-6 mr-3" />
                         <span className="text-base font-medium">{item.label}</span>
                       </div>
-                      {item.badge !== undefined && item.badge > 0 && (
-                        <span className={`px-2 py-1 text-xs font-bold rounded-full ${
-                          isActive ? 'bg-white text-[#F35E4A]' : 'bg-[#F35E4A] text-white'
-                        }`}>
-                          {item.badge}
-                        </span>
-                      )}
                     </button>
                   </li>
                 );
