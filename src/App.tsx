@@ -392,7 +392,7 @@ function App() {
                   rel="noopener noreferrer"
                   className="border-2 border-[#F35E4A] text-[#F35E4A] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#F35E4A] hover:text-white transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center"
                 >
-                  Chat with Aasha
+                  Join Waitlist
                 </a>
               </div>
             </div>
@@ -991,7 +991,7 @@ function App() {
               rel="noopener noreferrer"
               className="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-[#F35E4A] transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center"
             >
-              Chat with Aasha
+              Join Waitlist
             </a>
           </div>
         </div>
