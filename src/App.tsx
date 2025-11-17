@@ -294,13 +294,6 @@ function App() {
             </div>
             <div className="hidden md:flex items-center space-x-4">
               <button
-                onClick={() => setShowLogin(true)}
-                data-login-button
-                className="text-gray-700 hover:text-[#F35E4A] transition-colors font-semibold"
-              >
-                Login
-              </button>
-              <button
                 onClick={() => setShowOnboarding(true)}
                 className="bg-[#F35E4A] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#e54d37] transition-all shadow-md"
               >
@@ -348,15 +341,6 @@ function App() {
                   FAQ
                 </button>
                 <button
-                  onClick={() => {
-                    setShowLogin(true);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="w-full text-gray-700 hover:text-[#F35E4A] transition-colors font-semibold py-2 text-left mt-2"
-                >
-                  Login
-                </button>
-                <button
                   onClick={() => setShowOnboarding(true)}
                   className="w-full bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all shadow-md mt-4"
                 >
@@ -379,21 +363,13 @@ function App() {
               <p className="text-xl text-gray-700 mb-8 leading-relaxed">
                 Always there with care, support, guidance and conversations that fit your graceful vibe with comfort, joy and peace.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+              <div className="mb-8">
                 <button
                   onClick={() => setShowOnboarding(true)}
                   className="bg-[#F35E4A] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#e54d37] transition-all shadow-lg hover:shadow-xl"
                 >
                   Join Waitlist
                 </button>
-                <a
-                  href="https://t.me/aashabpbot?start=start"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border-2 border-[#F35E4A] text-[#F35E4A] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#F35E4A] hover:text-white transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center"
-                >
-                  Chat with Aasha
-                </a>
               </div>
             </div>
             <div className="relative">
@@ -977,7 +953,7 @@ function App() {
           <p className="text-xl text-white/80 mb-8">
             Join thousands of people finding joy, families who have found companionship and joy with AASHA.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <button
               onClick={() => setShowOnboarding(true)}
               className="bg-white text-[#F35E4A] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-all flex items-center justify-center shadow-lg hover:shadow-xl"
@@ -985,14 +961,6 @@ function App() {
               Join Waitlist
               <ArrowRight className="ml-2 h-5 w-5" />
             </button>
-            <a
-              href="https://t.me/aashabpbot?start=start"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-[#F35E4A] transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center"
-            >
-              Chat with Aasha
-            </a>
           </div>
         </div>
       </section>
