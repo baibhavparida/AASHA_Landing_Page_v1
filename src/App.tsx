@@ -31,11 +31,13 @@ import Onboarding from './components/Onboarding';
 import Dashboard from './components/Dashboard';
 import FamilyDashboard from './components/FamilyDashboard';
 import LoginModal from './components/LoginModal';
+import WaitlistModal from './components/WaitlistModal';
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [showOnboarding, setShowOnboarding] = React.useState(false);
   const [showLogin, setShowLogin] = React.useState(false);
+  const [showWaitlist, setShowWaitlist] = React.useState(false);
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const [isFamilyMember, setIsFamilyMember] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
@@ -294,7 +296,7 @@ function App() {
             </div>
             <div className="hidden md:flex items-center space-x-4">
               <button
-                onClick={() => setShowOnboarding(true)}
+                onClick={() => setShowWaitlist(true)}
                 className="bg-[#F35E4A] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#e54d37] transition-all shadow-md"
               >
                 Join Waitlist
@@ -341,7 +343,7 @@ function App() {
                   FAQ
                 </button>
                 <button
-                  onClick={() => setShowOnboarding(true)}
+                  onClick={() => setShowWaitlist(true)}
                   className="w-full bg-[#F35E4A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#e54d37] transition-all shadow-md mt-4"
                 >
                   Join Waitlist
@@ -365,7 +367,7 @@ function App() {
               </p>
               <div className="mb-8">
                 <button
-                  onClick={() => setShowOnboarding(true)}
+                  onClick={() => setShowWaitlist(true)}
                   className="bg-[#F35E4A] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#e54d37] transition-all shadow-lg hover:shadow-xl"
                 >
                   Join Waitlist
@@ -770,7 +772,7 @@ function App() {
 
           <div className="text-center mt-12">
             <button
-              onClick={() => setShowOnboarding(true)}
+              onClick={() => setShowWaitlist(true)}
               className="bg-[#F35E4A] text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-[#e54d37] transition-all shadow-md hover:shadow-lg"
             >
               Join Waitlist
@@ -955,7 +957,7 @@ function App() {
           </p>
           <div className="flex justify-center">
             <button
-              onClick={() => setShowOnboarding(true)}
+              onClick={() => setShowWaitlist(true)}
               className="bg-white text-[#F35E4A] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-all flex items-center justify-center shadow-lg hover:shadow-xl"
             >
               Join Waitlist
@@ -1041,6 +1043,10 @@ function App() {
           onClose={() => setShowLogin(false)}
           onLoginSuccess={handleLoginSuccess}
         />
+      )}
+
+      {showWaitlist && (
+        <WaitlistModal onClose={() => setShowWaitlist(false)} />
       )}
     </div>
   );
