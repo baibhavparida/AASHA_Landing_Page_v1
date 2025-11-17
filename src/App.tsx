@@ -1005,12 +1005,8 @@ function App() {
                   <span>info@aasha.net</span>
                 </div>
                 <div className="flex items-center justify-center">
-                  <Phone className="h-4 w-4 mr-2 text-[#F35E4A]" />
-                  <span>1-800-AASHA-1</span>
-                </div>
-                <div className="flex items-center justify-center">
                   <MapPin className="h-4 w-4 mr-2 text-[#F35E4A]" />
-                  <span>San Francisco, CA</span>
+                  <span>India</span>
                 </div>
               </div>
             </div>
