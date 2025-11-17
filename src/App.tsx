@@ -368,7 +368,7 @@ function App() {
               <div className="mb-8">
                 <button
                   onClick={() => setShowWaitlist(true)}
-                  className="bg-[#F35E4A] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#e54d37] transition-all shadow-lg hover:shadow-xl"
+                  className="w-full md:w-auto bg-[#F35E4A] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#e54d37] transition-all shadow-lg hover:shadow-xl"
                 >
                   Join Waitlist
                 </button>

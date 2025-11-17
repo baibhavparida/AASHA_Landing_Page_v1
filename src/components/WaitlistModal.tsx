@@ -9,6 +9,7 @@ interface WaitlistModalProps {
 export default function WaitlistModal({ onClose }: WaitlistModalProps) {
   const [formData, setFormData] = useState({
     fullName: '',
+    countryCode: '+1',
     phone: '',
     email: ''
   });
@@ -27,7 +28,7 @@ export default function WaitlistModal({ onClose }: WaitlistModalProps) {
         .insert([
           {
             full_name: formData.fullName,
-            phone: formData.phone,
+            phone: `${formData.countryCode}${formData.phone}`,
             email: formData.email
           }
         ]);
@@ -46,7 +47,7 @@ export default function WaitlistModal({ onClose }: WaitlistModalProps) {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
@@ -99,16 +100,40 @@ export default function WaitlistModal({ onClose }: WaitlistModalProps) {
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
                   Mobile Phone *
                 </label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#F35E4A] focus:border-transparent outline-none transition-all"
-                  placeholder="Enter your phone number"
-                />
+                <div className="flex gap-2">
+                  <select
+                    name="countryCode"
+                    value={formData.countryCode}
+                    onChange={handleChange}
+                    className="w-24 px-2 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#F35E4A] focus:border-transparent outline-none transition-all bg-white"
+                  >
+                    <option value="+1">+1</option>
+                    <option value="+44">+44</option>
+                    <option value="+91">+91</option>
+                    <option value="+86">+86</option>
+                    <option value="+81">+81</option>
+                    <option value="+49">+49</option>
+                    <option value="+33">+33</option>
+                    <option value="+39">+39</option>
+                    <option value="+34">+34</option>
+                    <option value="+61">+61</option>
+                    <option value="+971">+971</option>
+                    <option value="+65">+65</option>
+                    <option value="+52">+52</option>
+                    <option value="+55">+55</option>
+                    <option value="+7">+7</option>
+                  </select>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                    className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#F35E4A] focus:border-transparent outline-none transition-all"
+                    placeholder="Enter your phone number"
+                  />
+                </div>
               </div>
 
               <div>
