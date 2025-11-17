@@ -386,14 +386,6 @@ function App() {
                 >
                   Get Started for Free
                 </button>
-                <a
-                  href="https://t.me/aashabpbot?start=start"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border-2 border-[#F35E4A] text-[#F35E4A] px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#F35E4A] hover:text-white transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center"
-                >
-                  Join Waitlist
-                </a>
               </div>
             </div>
             <div className="relative">
@@ -985,14 +977,6 @@ function App() {
               Get Started for Free
               <ArrowRight className="ml-2 h-5 w-5" />
             </button>
-            <a
-              href="https://t.me/aashabpbot?start=start"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-[#F35E4A] transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center"
-            >
-              Join Waitlist
-            </a>
           </div>
         </div>
       </section>
