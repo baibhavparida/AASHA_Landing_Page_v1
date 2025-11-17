@@ -23,12 +23,27 @@ export default function WaitlistModal({ onClose }: WaitlistModalProps) {
     setLoading(true);
 
     try {
+      const fullPhone = `${formData.countryCode}${formData.phone}`;
+
+      const { data: existingEntries, error: checkError } = await supabase
+        .from('waitlist')
+        .select('*')
+        .or(`phone.eq.${fullPhone},email.eq.${formData.email}`);
+
+      if (checkError) throw checkError;
+
+      if (existingEntries && existingEntries.length > 0) {
+        setError('You are already registered for the waitlist!');
+        setLoading(false);
+        return;
+      }
+
       const { error: insertError } = await supabase
         .from('waitlist')
         .insert([
           {
             full_name: formData.fullName,
-            phone: `${formData.countryCode}${formData.phone}`,
+            phone: fullPhone,
             email: formData.email
           }
         ]);
