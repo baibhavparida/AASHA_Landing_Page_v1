@@ -358,7 +358,7 @@ function App() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Aasha - Your friendly companion
+                Aasha - Your friendly companion always by your side
               </h1>
               <p className="text-xl text-gray-700 mb-8 leading-relaxed">
                 Always there with care, support, guidance and conversations that fit your graceful vibe with comfort, joy and peace.
