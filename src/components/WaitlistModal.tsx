@@ -6,6 +6,24 @@ interface WaitlistModalProps {
   onClose: () => void;
 }
 
+const COUNTRY_PHONE_LIMITS: Record<string, { maxDigits: number; name: string }> = {
+  '+1': { maxDigits: 10, name: 'US/Canada' },
+  '+44': { maxDigits: 10, name: 'UK' },
+  '+91': { maxDigits: 10, name: 'India' },
+  '+86': { maxDigits: 11, name: 'China' },
+  '+81': { maxDigits: 10, name: 'Japan' },
+  '+49': { maxDigits: 11, name: 'Germany' },
+  '+33': { maxDigits: 9, name: 'France' },
+  '+39': { maxDigits: 10, name: 'Italy' },
+  '+34': { maxDigits: 9, name: 'Spain' },
+  '+61': { maxDigits: 9, name: 'Australia' },
+  '+971': { maxDigits: 9, name: 'UAE' },
+  '+65': { maxDigits: 8, name: 'Singapore' },
+  '+52': { maxDigits: 10, name: 'Mexico' },
+  '+55': { maxDigits: 11, name: 'Brazil' },
+  '+7': { maxDigits: 10, name: 'Russia' },
+};
+
 export default function WaitlistModal({ onClose }: WaitlistModalProps) {
   const [formData, setFormData] = useState({
     fullName: '',
@@ -74,10 +92,24 @@ export default function WaitlistModal({ onClose }: WaitlistModalProps) {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    const { name, value } = e.target;
+
+    if (name === 'phone') {
+      const digitsOnly = value.replace(/\D/g, '');
+      const maxDigits = COUNTRY_PHONE_LIMITS[formData.countryCode]?.maxDigits || 15;
+
+      if (digitsOnly.length <= maxDigits) {
+        setFormData(prev => ({
+          ...prev,
+          [name]: digitsOnly
+        }));
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   return (
@@ -156,10 +188,14 @@ export default function WaitlistModal({ onClose }: WaitlistModalProps) {
                     value={formData.phone}
                     onChange={handleChange}
                     required
+                    maxLength={COUNTRY_PHONE_LIMITS[formData.countryCode]?.maxDigits || 15}
                     className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#F35E4A] focus:border-transparent outline-none transition-all"
                     placeholder="Enter your phone number"
                   />
                 </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {formData.phone.length}/{COUNTRY_PHONE_LIMITS[formData.countryCode]?.maxDigits || 15} digits
+                </p>
               </div>
 
               <div>
