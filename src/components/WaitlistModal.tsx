@@ -30,7 +30,10 @@ export default function WaitlistModal({ onClose }: WaitlistModalProps) {
         .select('*')
         .or(`phone.eq.${fullPhone},email.eq.${formData.email}`);
 
-      if (checkError) throw checkError;
+      if (checkError) {
+        console.error('Check error:', checkError);
+        throw checkError;
+      }
 
       if (existingEntries && existingEntries.length > 0) {
         setError('You are already registered for the waitlist!');
@@ -48,7 +51,15 @@ export default function WaitlistModal({ onClose }: WaitlistModalProps) {
           }
         ]);
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Insert error details:', {
+          message: insertError.message,
+          details: insertError.details,
+          hint: insertError.hint,
+          code: insertError.code
+        });
+        throw insertError;
+      }
 
       setSuccess(true);
       setTimeout(() => {
