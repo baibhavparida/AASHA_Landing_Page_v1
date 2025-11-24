@@ -38,6 +38,13 @@ export default function WaitlistModal({ onClose }: WaitlistModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    const requiredDigits = COUNTRY_PHONE_LIMITS[formData.countryCode]?.maxDigits || 15;
+    if (formData.phone.length !== requiredDigits) {
+      setError(`Please enter a valid ${requiredDigits}-digit phone number for ${COUNTRY_PHONE_LIMITS[formData.countryCode]?.name || 'this country'}.`);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -189,12 +196,24 @@ export default function WaitlistModal({ onClose }: WaitlistModalProps) {
                     onChange={handleChange}
                     required
                     maxLength={COUNTRY_PHONE_LIMITS[formData.countryCode]?.maxDigits || 15}
-                    className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#F35E4A] focus:border-transparent outline-none transition-all"
+                    className={`flex-1 px-4 py-3 rounded-lg border focus:ring-2 focus:ring-[#F35E4A] focus:border-transparent outline-none transition-all ${
+                      formData.phone.length > 0 && formData.phone.length !== COUNTRY_PHONE_LIMITS[formData.countryCode]?.maxDigits
+                        ? 'border-red-300'
+                        : 'border-gray-300'
+                    }`}
                     placeholder="Enter your phone number"
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className={`text-xs mt-1 ${
+                  formData.phone.length === 0
+                    ? 'text-gray-500'
+                    : formData.phone.length === COUNTRY_PHONE_LIMITS[formData.countryCode]?.maxDigits
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                }`}>
                   {formData.phone.length}/{COUNTRY_PHONE_LIMITS[formData.countryCode]?.maxDigits || 15} digits
+                  {formData.phone.length > 0 && formData.phone.length !== COUNTRY_PHONE_LIMITS[formData.countryCode]?.maxDigits &&
+                    ' (required)'}
                 </p>
               </div>
 
