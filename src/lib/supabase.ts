@@ -6,9 +6,10 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 console.log('Supabase initialization:', {
   hasUrl: !!supabaseUrl,
   hasKey: !!supabaseAnonKey,
-  url: supabaseUrl ? `${supabaseUrl.substring(0, 30)}...` : 'missing',
+  url: supabaseUrl || 'NOT SET',
   mode: import.meta.env.MODE,
-  dev: import.meta.env.DEV
+  dev: import.meta.env.DEV,
+  allEnvVars: import.meta.env
 });
 
 if (!supabaseUrl || !supabaseAnonKey) {
@@ -16,8 +17,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('VITE_SUPABASE_URL:', supabaseUrl || 'NOT SET');
   console.error('VITE_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'SET' : 'NOT SET');
   console.error('Available env vars:', Object.keys(import.meta.env));
+  console.error('Raw env values:', {
+    url: import.meta.env.VITE_SUPABASE_URL,
+    key: import.meta.env.VITE_SUPABASE_ANON_KEY
+  });
 
-  const errorMessage = 'Missing Supabase environment variables. Please restart the dev server to load environment variables from the .env file.';
+  const errorMessage = 'Missing Supabase environment variables. The .env file exists but variables are not loaded. The dev server must be restarted.';
   console.error(errorMessage);
   throw new Error(errorMessage);
 }
