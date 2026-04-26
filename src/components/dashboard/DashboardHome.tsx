@@ -121,36 +121,21 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
       setCallError(null);
       setCallSuccess(false);
 
-      // Fetch comprehensive user data from the database
-      // Call the database function to get all user data
-      const { data: fullProfileData, error: dbError } = await supabase
-        .rpc('get_elderly_profile_full_details', {
-          p_elderly_profile_id: elderlyProfile.id
-        });
+      const { data: { session } } = await supabase.auth.getSession();
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 
-      if (dbError) {
-        console.error('Error fetching profile data:', dbError);
-        throw new Error('Failed to fetch user data');
-      }
-
-      // Send all available data to the webhook
-      const response = await fetch('https://sunitaai.app.n8n.cloud/webhook/Initiate_routine_call', {
+      const response = await fetch(`${supabaseUrl}/functions/v1/initiate-routine-call`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`,
         },
-        body: JSON.stringify({
-          elderly_profile_id: elderlyProfile.id,
-          first_name: elderlyProfile.first_name,
-          last_name: elderlyProfile.last_name,
-          call_time_preference: elderlyProfile.call_time_preference,
-          // Include all comprehensive data from database
-          profile_data: fullProfileData || {},
-        }),
+        body: JSON.stringify({ elderly_profile_id: elderlyProfile.id }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to initiate call');
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || 'Failed to initiate call');
       }
 
       setCallSuccess(true);
