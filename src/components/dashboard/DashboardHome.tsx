@@ -123,12 +123,15 @@ const DashboardHome: React.FC<DashboardHomeProps> = ({ elderlyProfile, onNavigat
 
       const { data: { session } } = await supabase.auth.getSession();
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const authToken = session?.access_token ?? anonKey;
 
       const response = await fetch(`${supabaseUrl}/functions/v1/initiate-routine-call`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`,
+          'Authorization': `Bearer ${authToken}`,
+          'Apikey': anonKey,
         },
         body: JSON.stringify({ elderly_profile_id: elderlyProfile.id }),
       });
