@@ -56,11 +56,10 @@ export async function processRetellWebhook(
       };
     }
 
-    const startDate = new Date(webhookData.start_timestamp * 1000).toISOString();
     const endDate = webhookData.end_timestamp
       ? new Date(webhookData.end_timestamp * 1000).toISOString()
       : null;
-    const durationSeconds = webhookData.end_timestamp
+    const durationSeconds = webhookData.end_timestamp && webhookData.start_timestamp
       ? webhookData.end_timestamp - webhookData.start_timestamp
       : 0;
 
@@ -245,8 +244,8 @@ export async function getCallAnalytics(elderlyProfileId: string, days: number = 
       call_costs(*)
     `)
     .eq('elderly_profile_id', elderlyProfileId)
-    .gte('started_at', startDate.toISOString())
-    .order('started_at', { ascending: false });
+    .gte('created_at', startDate.toISOString())
+    .order('created_at', { ascending: false });
 
   if (error) {
     console.error('Error fetching call analytics:', error);

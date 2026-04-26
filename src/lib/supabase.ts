@@ -16,10 +16,6 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('VITE_SUPABASE_URL:', supabaseUrl || 'NOT SET');
   console.error('VITE_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'SET' : 'NOT SET');
   console.error('Available env vars:', Object.keys(import.meta.env));
-
-  const errorMessage = 'Missing Supabase environment variables. Please restart the dev server to load environment variables from the .env file.';
-  console.error(errorMessage);
-  throw new Error(errorMessage);
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -103,9 +99,8 @@ export interface Database {
           id: string;
           elderly_profile_id: string;
           name: string;
-          dosage: string;
-          frequency: string;
-          time: string;
+          dosage_quantity: number;
+          times_of_day: string[];
           created_at: string;
           updated_at: string;
         };
@@ -113,11 +108,15 @@ export interface Database {
           id?: string;
           elderly_profile_id: string;
           name: string;
-          dosage: string;
-          frequency: string;
-          time: string;
+          dosage_quantity?: number;
+          times_of_day?: string[];
           created_at?: string;
           updated_at?: string;
+        };
+        Update: {
+          name?: string;
+          dosage_quantity?: number;
+          times_of_day?: string[];
         };
       };
       interests: {
@@ -137,11 +136,10 @@ export interface Database {
       calls: {
         Row: {
           id: string;
-          retell_call_id: string;
+          retell_call_id: string | null;
           elderly_profile_id: string;
-          call_type: 'onboarding' | 'daily_checkin';
-          call_status: 'successful' | 'voicemail' | 'failed';
-          started_at: string;
+          call_type: string | null;
+          call_status: string | null;
           ended_at: string | null;
           duration_seconds: number;
           agent_id: string | null;
@@ -154,11 +152,10 @@ export interface Database {
         };
         Insert: {
           id?: string;
-          retell_call_id: string;
+          retell_call_id?: string | null;
           elderly_profile_id: string;
-          call_type: 'onboarding' | 'daily_checkin';
-          call_status: 'successful' | 'voicemail' | 'failed';
-          started_at: string;
+          call_type?: string | null;
+          call_status?: string | null;
           ended_at?: string | null;
           duration_seconds?: number;
           agent_id?: string | null;
@@ -170,7 +167,9 @@ export interface Database {
           updated_at?: string;
         };
         Update: {
-          call_status?: 'successful' | 'voicemail' | 'failed';
+          retell_call_id?: string | null;
+          call_type?: string | null;
+          call_status?: string | null;
           ended_at?: string | null;
           duration_seconds?: number;
           agent_id?: string | null;
